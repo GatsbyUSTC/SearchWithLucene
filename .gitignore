@@ -1,0 +1,5 @@
+lib/lucene-4.10.2/docs
+build/
+*.class
+*.swp
+*.swn

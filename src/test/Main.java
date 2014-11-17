@@ -1,17 +1,24 @@
 package test;
 
-
-
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class Main {
 
 	public static void main(String[] args) {
-		SocialTVAnalyticsSearchPart stasp = new SocialTVAnalyticsSearchPart();
-		long startTime = System.currentTimeMillis();
-		System.out.println("index write starts");
-		stasp.writeIndex();
-		long endTime = System.currentTimeMillis();
-		System.out.println("index write finishes");
-		System.out.println("total time: " + (endTime - startTime) + " ms");
+		// TODO Auto-generated method stub
+		JSONObject jsonObject = new JSONObject();
+		change(jsonObject);
+		System.out.println(jsonObject);
 	}
+	public static void change(JSONObject a)
+	{
+		try {
+			a.append("a", "nothing");
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 }
