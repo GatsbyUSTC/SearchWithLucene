@@ -9,8 +9,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.analysis.util.CharArraySet;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.IntField;
@@ -22,20 +20,26 @@ import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
+import org.wltea.analyzer.lucene.IKAnalyzer;
+
+import com.mysql.jdbc.Driver;
 
 public class Indexer {
 
+	private static String indexPath = "/home/hongwei/workspace/stvsearch/index";
+	private static String password = "SocialTV";
+	private static String username = "socialtv";
+	private static String dburl = "jdbc:mysql://155.69.146.44:3306/socialtv";
+	
 	public Indexer() {
 
 	}
 
 	private static Connection connectToDatabase() {
-		String username = "socialtv";
-		String password = "SocialTV";
-		String url = "jdbc:mysql://155.69.146.44:3306/socialtv";
 		Connection con = null;
 		try {
-			con = DriverManager.getConnection(url, username, password);
+			DriverManager.registerDriver(new Driver());
+			con = DriverManager.getConnection(dburl, username, password);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -44,14 +48,12 @@ public class Indexer {
 	}
 
 	private static void addDocument(ResultSet rs, OpenMode om) {
-		String indexPath = "/home/hongwei/workspace/stvsearch/index";
-
+		
 		Directory indexDir = null;
 		IndexWriter indexWriter = null;
-		Analyzer analyzer = new StandardAnalyzer(CharArraySet.EMPTY_SET);
+		Analyzer analyzer = new IKAnalyzer(true);
 
-		@SuppressWarnings("deprecation")
-		IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_CURRENT,
+		IndexWriterConfig iwc = new IndexWriterConfig(Version.LATEST,
 				analyzer);
 		iwc.setOpenMode(om);
 		try {
@@ -80,7 +82,6 @@ public class Indexer {
 				byte[] tempDescription = rs.getBytes("description");
 				description = new String(tempDescription, "UTF-8");
 				// description = rs.getString("description");
-				System.out.print(description);
 				// rating_total = rs.getString("rating_total");
 				// rating_count = rs.getString("rating_count");
 				// video_info = rs.getString("video_info");
@@ -134,8 +135,7 @@ public class Indexer {
 				+ "category_id," + "creation_time," + "update_time,"
 				+ "watch_count," + "status," + "description," + "rating_total,"
 				+ "rating_count," + "video_info," + "checksum FROM content"
-				+ "WHERE id = " + id;
-
+				+ " WHERE id = '" + id + "'";
 		Connection con = connectToDatabase();
 		try {
 			Statement stmt = con.createStatement();

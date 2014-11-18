@@ -7,13 +7,14 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
-	<classpathentry kind="lib" path="/home/hongwei/workspace/stvsearch/lib/mysql-connector-java-5.1.33-bin.jar"/>
 	<classpathentry kind="lib" path="/home/hongwei/workspace/stvsearch/lib/org.json-20120521.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jst.server.core.container/org.eclipse.jst.server.tomcat.runtimeTarget/Apache Tomcat v7.0"/>
 	<classpathentry kind="lib" path="/home/hongwei/workspace/stvsearch/lib/lucene-4.10.2/suggest/lucene-suggest-4.10.2.jar"/>
-	<classpathentry kind="lib" path="/home/hongwei/workspace/stvsearch/lib/lucene-4.10.2/core/lucene-core-4.10.2.jar"/>
+	<classpathentry kind="lib" path="/home/hongwei/workspace/stvsearch/lib/lucene-4.10.2/core/lucene-core-4.10.2.jar" sourcepath="/home/hongwei/workspace/stvsearch/lib/lucene-4.10.2/core"/>
 	<classpathentry kind="lib" path="/home/hongwei/workspace/stvsearch/lib/lucene-4.10.2/queryparser/lucene-queryparser-4.10.2.jar"/>
 	<classpathentry kind="lib" path="/home/hongwei/workspace/stvsearch/lib/lucene-4.10.2/queries/lucene-queries-4.10.2.jar"/>
 	<classpathentry kind="lib" path="/home/hongwei/workspace/stvsearch/lib/lucene-4.10.2/analysis/common/lucene-analyzers-common-4.10.2.jar"/>
+	<classpathentry kind="lib" path="/home/hongwei/workspace/stvsearch/lib/IK Analyzer 2012FF_hf1/IKAnalyzer2012FF_u1.jar"/>
+	<classpathentry kind="lib" path="/home/hongwei/workspace/stvsearch/lib/mysql-connector-java-5.1.33-bin.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

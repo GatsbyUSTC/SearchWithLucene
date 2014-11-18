@@ -3,7 +3,6 @@ package newpackage;
 import java.io.File;
 import java.sql.Date;
 
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.Term;
@@ -21,34 +20,28 @@ import org.apache.lucene.search.SortField.Type;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.util.Version;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.wltea.analyzer.lucene.IKAnalyzer;
 
 public class Searcher {
+
+	private static String indexPath = "/home/hongwei/workspace/stvsearch/index";
+	private static final int DEFAULTRESPONSECOUNT = 500;
+
 	private JSONObject requestJson;
 	private JSONObject responseJson;
 
-	public Searcher(JSONObject json){
+	public Searcher(JSONObject json) {
 		requestJson = json;
 		responseJson = new JSONObject();
 	}
 
-	private void search(){
-		String indexPath = "/home/hongwei/workspace/stvsearch/index";
+	private void search() {
 		String[] fields = { "title", "description" };
 		try {
 			String keywords = requestJson.getString("keywords");
-			String[] sugWrods = Suggester.suggestSpellChecker(keywords);
-			
-			JSONArray jsonArray = new JSONArray();
-			for (String string : sugWrods) {
-				jsonArray.put(string);
-			}
-			responseJson.put("suggestWords", jsonArray);
-			@SuppressWarnings("deprecation")
-			MultiFieldQueryParser mfqp = new MultiFieldQueryParser(
-					Version.LUCENE_CURRENT, fields, new StandardAnalyzer());
+			MultiFieldQueryParser mfqp = new MultiFieldQueryParser(fields, new IKAnalyzer(true));
 			Query query = mfqp.parse(keywords);
 
 			String owner_id = null, category_id = null;
@@ -108,7 +101,7 @@ public class Searcher {
 					sort = new Sort(new SortField("tempTime", Type.LONG, true));
 			}
 
-			int startIndex = 0, requestCount = 500;
+			int startIndex = 0, requestCount = DEFAULTRESPONSECOUNT;
 			if (requestJson.has("startIndex"))
 				startIndex = requestJson.getInt("startIndex");
 			if (requestJson.has("requestCount"))
@@ -135,18 +128,29 @@ public class Searcher {
 			int responseCount = Math.min(topDocs.totalHits - startIndex,
 					requestCount);
 			responseCount = responseCount < 0 ? 0 : responseCount;
+			
+			if (responseCount < 3) {
+				String[] sugWrods = Suggester.suggestSpellChecker(keywords);
+
+				JSONArray jsonArray = new JSONArray();
+				for (String string : sugWrods) {
+					jsonArray.put(string);
+				}
+				responseJson.put("suggestWords", jsonArray);
+			}
+			
 			responseJson.put("responseCount", responseCount);
+			
 			JSONArray data = new JSONArray();
 			for (int i = startIndex; i < responseCount + startIndex; i++) {
 				Document doc = searcher.doc(hits[i].doc);
 				JSONObject json = new JSONObject();
-//				json.put("creation_time", doc.get("creation_time"));
-//				json.put("owner_id", doc.get("owner_id"));
-//				json.put("category_id", doc.get("category_id"));
+				// json.put("creation_time", doc.get("creation_time"));
+				// json.put("owner_id", doc.get("owner_id"));
+				// json.put("category_id", doc.get("category_id"));
 				json.put("id", doc.get("id"));
 				json.put("description", doc.get("description"));
-				System.out.println(doc.get("description"));
-//				json.put("watch_count", doc.get("watch_count"));
+				// json.put("watch_count", doc.get("watch_count"));
 				json.put("title", doc.get("title"));
 				data.put(json);
 			}
@@ -156,9 +160,9 @@ public class Searcher {
 		}
 	}
 
-	public JSONObject getResponse(){
+	public JSONObject getResponse() {
 		search();
 		return responseJson;
 	}
-	
+
 }

@@ -3,7 +3,6 @@ package newpackage;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.search.spell.LuceneLevenshteinDistance;
 import org.apache.lucene.search.spell.PlainTextDictionary;
@@ -11,6 +10,7 @@ import org.apache.lucene.search.spell.SpellChecker;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
+import org.wltea.analyzer.lucene.IKAnalyzer;
 
 public class Suggester {
 
@@ -23,9 +23,8 @@ public class Suggester {
 		try {
 			Directory dir = FSDirectory.open(new File(spellCheckerPath));
 			SpellChecker spellChecker = new SpellChecker(dir);
-			@SuppressWarnings("deprecation")
 			IndexWriterConfig iwc = new IndexWriterConfig(
-					Version.LUCENE_CURRENT, new StandardAnalyzer());
+					Version.LATEST, new IKAnalyzer(true));
 			spellChecker.indexDictionary(new PlainTextDictionary(new File(
 					spellCheckerDictPath)), iwc, false);
 			spellChecker.close();
