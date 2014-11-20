@@ -158,8 +158,6 @@ public class Searcher {
 				Document doc = searcher.doc(hits[i].doc);
 				JSONObject json = new JSONObject();
 				json.put("id", doc.get("id"));
-				json.put("description", doc.get("description"));
-				json.put("title", doc.get("title"));
 				data.put(json);
 			}
 			responseJson.put("data", data);
