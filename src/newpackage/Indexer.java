@@ -20,6 +20,8 @@ import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.wltea.analyzer.lucene.IKAnalyzer;
 
 import com.mysql.jdbc.Driver;
@@ -146,8 +148,15 @@ public class Indexer {
 
 	// This static method is called when user wants to index one new video's
 	// information with its id.
-	public static void indexOneDoc(String id) {
+	public static void indexOneDoc(JSONObject json) {
 		// Construct database query
+		String id = null;
+		try {
+			id = json.getString("id");
+		} catch (JSONException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		String dbquery = "SELECT " + "id, " + "title, " + "owner_id, "
 				+ "category_id," + "creation_time," + "update_time,"
 				+ "watch_count," + "status," + "description," + "rating_total,"
