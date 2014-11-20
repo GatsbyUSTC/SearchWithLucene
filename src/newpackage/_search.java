@@ -13,7 +13,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * Servlet implementation class _search
+ * Servlet implementation class _search This Servlet is called when searching.
  */
 @WebServlet("/_search")
 public class _search extends HttpServlet {
@@ -44,8 +44,12 @@ public class _search extends HttpServlet {
 	protected void doPost(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		response.setContentType ("application/json; charset=UTF-8");
+
+		// Set response content type and get response writer.
+		response.setContentType("application/json; charset=UTF-8");
 		PrintWriter out = response.getWriter();
+
+		// Get request and parse it to JSON
 		StringBuffer jb = new StringBuffer();
 		BufferedReader reader = request.getReader();
 		String line = null;
@@ -53,10 +57,11 @@ public class _search extends HttpServlet {
 			jb.append(line);
 
 		try {
-			
+
+			// search and output the results
 			Searcher indexSearcher = new Searcher(new JSONObject(jb.toString()));
 			out.print(indexSearcher.getResponse());
-			
+
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

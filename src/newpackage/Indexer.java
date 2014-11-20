@@ -26,19 +26,29 @@ import com.mysql.jdbc.Driver;
 
 public class Indexer {
 
-	private static String indexPath = "/home/hongwei/workspace/stvsearch/index";
-	private static String password = "SocialTV";
-	private static String username = "socialtv";
+	// indexPath is the place where we want to store the index.
+	public static String indexPath = "/home/hongwei/workspace/stvsearch/index";
+	// This is the java format url of the database
 	private static String dburl = "jdbc:mysql://155.69.146.44:3306/socialtv";
-	
+	// This is the username of the database
+	private static String username = "socialtv";
+	// This is the password of the database
+	private static String password = "SocialTV";
+
 	public Indexer() {
 
 	}
 
-	private static Connection connectToDatabase() {
+	private static Connection connectToDatabase() { // Our data comes from a
+													// remote database. This
+													// method is used to make a
+													// connection.
 		Connection con = null;
 		try {
+			// Before get connection, the mysql driver should be registered
+			// first.
 			DriverManager.registerDriver(new Driver());
+			// Get the connection
 			con = DriverManager.getConnection(dburl, username, password);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -48,45 +58,52 @@ public class Indexer {
 	}
 
 	private static void addDocument(ResultSet rs, OpenMode om) {
-		
+
 		Directory indexDir = null;
 		IndexWriter indexWriter = null;
+		// IKanalyzer is a good analyzer for both Chinese and English.
 		Analyzer analyzer = new IKAnalyzer(true);
-
-		IndexWriterConfig iwc = new IndexWriterConfig(Version.LATEST,
-				analyzer);
+		// This IndexWriterConfig is used to specify the version and analyzer.
+		IndexWriterConfig iwc = new IndexWriterConfig(Version.LATEST, analyzer);
+		// OpenMode refers to the open mode of index: CREATE or APPEND can be
+		// chosen.
 		iwc.setOpenMode(om);
+
 		try {
 			indexDir = FSDirectory.open(new File(indexPath));
+			// After several configurations, we can create a IndexWriter now.
 			indexWriter = new IndexWriter(indexDir, iwc);
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+
 		String id = null, title = null, owner_id = null, category_id = null, description = null, creation_time = null;
 		// String update_time = null, status = null, rating_total = null,
 		// rating_count = null, video_info = null, check_sum = null;
 		long watch_count = 0, tempTime = 0;
 		int tempDate = 0;
 		try {
+			// Get some key attributes from ResultSet.
+			// For the output of database is "UTF-8", we need to make some
+			// transcoding here.
 			while (rs.next()) {
+
 				id = rs.getString("id");
-				title = rs.getString("title");
+
+				byte[] tempTitle = rs.getBytes("title");
+				title = new String(tempTitle, "UTF-8");
+
 				owner_id = rs.getString("owner_id") == null ? "0" : rs
 						.getString("owner_id");
+
 				category_id = rs.getString("category_id");
-				creation_time = rs.getString("creation_time");
-				// update_time = rs.getString("update_time");
 				watch_count = rs.getLong("watch_count");
-				// status = rs.getString("status");
+
 				byte[] tempDescription = rs.getBytes("description");
 				description = new String(tempDescription, "UTF-8");
-				// description = rs.getString("description");
-				// rating_total = rs.getString("rating_total");
-				// rating_count = rs.getString("rating_count");
-				// video_info = rs.getString("video_info");
-				// check_sum = rs.getString("checksum");
 
+				creation_time = rs.getString("creation_time");
 				tempDate = Integer.parseInt(creation_time.substring(0, 4)
 						+ creation_time.substring(5, 7)
 						+ creation_time.substring(8, 10));
@@ -97,29 +114,26 @@ public class Indexer {
 						+ creation_time.substring(14, 16)
 						+ creation_time.substring(17, 19));
 
+				// Create a new Document for each video's information.
 				Document doc = new Document();
 				doc.add(new TextField("id", id, Store.YES));
+
+				// As the title is more important than description, the title
+				// field boost is set as 2.0 here.
 				TextField titleField = new TextField("title", title, Store.YES);
 				titleField.setBoost(2.0f);
 				doc.add(titleField);
+
+				// Add all fields of a video to the document
 				doc.add(new TextField("owner_id", owner_id, Store.YES));
 				doc.add(new TextField("category_id", category_id, Store.YES));
 				doc.add(new TextField("creation_time", creation_time, Store.YES));
-				// doc.add(new TextField("update_time", update_time,
-				// Store.YES));
 				doc.add(new LongField("watch_count", watch_count, Store.YES));
-				// doc.add(new TextField("status", status, Store.YES));
 				doc.add(new TextField("description", description, Store.YES));
-				// doc.add(new TextField("rating_total", rating_total,
-				// Store.YES));
-				// doc.add(new TextField("rating_count", rating_count,
-				// Store.YES));
-				// doc.add(new TextField("video_info", video_info, Store.YES));
-				// doc.add(new TextField("checksum", check_sum, Store.YES));
-
 				doc.add(new IntField("tempDate", tempDate, Store.YES));
 				doc.add(new LongField("tempTime", tempTime, Store.YES));
 
+				// Index the video using IndexWriter.
 				indexWriter.addDocument(doc);
 			}
 			indexWriter.close();
@@ -130,7 +144,10 @@ public class Indexer {
 
 	}
 
+	// This static method is called when user wants to index one new video's
+	// information with its id.
 	public static void indexOneDoc(String id) {
+		// Construct database query
 		String dbquery = "SELECT " + "id, " + "title, " + "owner_id, "
 				+ "category_id," + "creation_time," + "update_time,"
 				+ "watch_count," + "status," + "description," + "rating_total,"
@@ -140,7 +157,8 @@ public class Indexer {
 		try {
 			Statement stmt = con.createStatement();
 			ResultSet rs = stmt.executeQuery(dbquery);
-
+			// We want to add the information of the video to the index, so the
+			// OpenMoode should be APPEND.
 			addDocument(rs, OpenMode.APPEND);
 
 			rs.close();
@@ -153,7 +171,10 @@ public class Indexer {
 
 	}
 
+	// This static method is called when user wants to reindex all videos'
+	// information.
 	public static void indexAllDocs() {
+		// Construct database query
 		String dbquery = "SELECT " + "id, " + "title, " + "owner_id, "
 				+ "category_id," + "creation_time," + "update_time,"
 				+ "watch_count," + "status," + "description," + "rating_total,"
@@ -163,7 +184,7 @@ public class Indexer {
 		try {
 			Statement stmt = con.createStatement();
 			ResultSet rs = stmt.executeQuery(dbquery);
-
+			// We want to recreate an index, so the OpenMode should be CREATE.
 			addDocument(rs, OpenMode.CREATE);
 
 			rs.close();
@@ -175,5 +196,4 @@ public class Indexer {
 		}
 	}
 
-		
 }

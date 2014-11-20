@@ -26,7 +26,8 @@ import org.wltea.analyzer.lucene.IKAnalyzer;
 
 public class Searcher {
 
-	private static String indexPath = "/home/hongwei/workspace/stvsearch/index";
+	private static String indexPath = Indexer.indexPath;
+	// When searching, there is a default max response count, I make it 500.
 	private static final int DEFAULTRESPONSECOUNT = 500;
 
 	private JSONObject requestJson;
@@ -38,10 +39,16 @@ public class Searcher {
 	}
 
 	private void search() {
+		// The fields we want to search.
 		String[] fields = { "title", "description" };
 		try {
+			// Get search keywords from request
 			String keywords = requestJson.getString("keywords");
-			MultiFieldQueryParser mfqp = new MultiFieldQueryParser(fields, new IKAnalyzer(true));
+			// With MultiFieldQueryPaser, we specify fields and analyzer
+			MultiFieldQueryParser mfqp = new MultiFieldQueryParser(fields,
+					new IKAnalyzer(true));
+			// Get Query after parsing the keywords with the help of
+			// MultiFieldQueryParser.
 			Query query = mfqp.parse(keywords);
 
 			String owner_id = null, category_id = null;
@@ -50,11 +57,13 @@ public class Searcher {
 				JSONObject filter = requestJson.getJSONObject("filter");
 				if (filter.has("owner_id")) {
 					owner_id = filter.getString("owner_id");
+					// Create a TermsFilter when user specify an owner_id.
 					ownerIdFilter = new TermsFilter(new Term("owner_id",
 							owner_id));
 				}
 				if (filter.has("category_id")) {
 					category_id = filter.getString("category_id");
+					// Create a TermsFilter when user specify a category_id.
 					categoryIdFilter = new TermsFilter(new Term("category_id",
 							category_id));
 				}
@@ -75,19 +84,10 @@ public class Searcher {
 				int endTime = Integer.parseInt(temp.substring(0, 4)
 						+ temp.substring(5, 7) + temp.substring(8, 10));
 
+				// Create a NumericRangeFilter when user specify the creation
+				// time.
 				inDaysFilter = NumericRangeFilter.newIntRange("tempDate",
 						startTime, endTime, true, true);
-				/*
-				 * Date startDate = new Date(System.currentTimeMillis() -
-				 * (long)inDays 24l * 3600l * 1000l); Date endDate = new
-				 * Date(System.currentTimeMillis()); String startTime =
-				 * startDate.toString() + " 00:00:00.0", endTime = endDate
-				 * .toString() + " 23:59:59.0"; out.print(startTime);
-				 * out.print(endTime); inDaysFilter = new
-				 * TermRangeFilter("creation_time", new
-				 * BytesRef(startTime.getBytes()), new BytesRef(
-				 * endTime.getBytes()), true, true);
-				 */
 			}
 
 			String sortWay = null;
@@ -97,6 +97,7 @@ public class Searcher {
 				if (sortWay.equals("v"))
 					sort = new Sort(new SortField("watch_count", Type.LONG,
 							true));
+				// Create a Sort when user specify a sort way.
 				else if (sortWay.equals("t"))
 					sort = new Sort(new SortField("tempTime", Type.LONG, true));
 			}
@@ -107,6 +108,7 @@ public class Searcher {
 			if (requestJson.has("requestCount"))
 				requestCount = requestJson.getInt("requestCount");
 
+			// Attach the filters to the query if they exist.
 			if (ownerIdFilter != null)
 				query = new FilteredQuery(query, ownerIdFilter);
 			if (categoryIdFilter != null)
@@ -115,20 +117,25 @@ public class Searcher {
 				query = new FilteredQuery(query, inDaysFilter);
 
 			Directory directory = FSDirectory.open(new File(indexPath));
+			// Create an IndexSearcher
 			IndexSearcher searcher = new IndexSearcher(
 					DirectoryReader.open(directory));
 
 			TopDocs topDocs = null;
+			// Start to search
 			if (sort == null)
 				topDocs = searcher.search(query, startIndex + requestCount * 2);
 			else
 				topDocs = searcher.search(query, startIndex + requestCount * 2,
 						sort);
+			// Get hit documents
 			ScoreDoc[] hits = topDocs.scoreDocs;
+			// Get hit document number
 			int responseCount = Math.min(topDocs.totalHits - startIndex,
 					requestCount);
 			responseCount = responseCount < 0 ? 0 : responseCount;
-			
+
+			// When there is few hits, we generate some suggest words
 			if (responseCount < 3) {
 				String[] sugWrods = Suggester.suggestSpellChecker(keywords);
 
@@ -138,19 +145,16 @@ public class Searcher {
 				}
 				responseJson.put("suggestWords", jsonArray);
 			}
-			
+
 			responseJson.put("responseCount", responseCount);
-			
+
+			// Put all data into responseJson
 			JSONArray data = new JSONArray();
 			for (int i = startIndex; i < responseCount + startIndex; i++) {
 				Document doc = searcher.doc(hits[i].doc);
 				JSONObject json = new JSONObject();
-				// json.put("creation_time", doc.get("creation_time"));
-				// json.put("owner_id", doc.get("owner_id"));
-				// json.put("category_id", doc.get("category_id"));
 				json.put("id", doc.get("id"));
 				json.put("description", doc.get("description"));
-				// json.put("watch_count", doc.get("watch_count"));
 				json.put("title", doc.get("title"));
 				data.put(json);
 			}
