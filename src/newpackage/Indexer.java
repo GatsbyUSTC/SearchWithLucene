@@ -28,8 +28,6 @@ import com.mysql.jdbc.Driver;
 
 public class Indexer {
 
-	// indexPath is the place where we want to store the index.
-	public static String indexPath = "/home/hongwei/workspace/stvsearch/index";
 	// This is the java format url of the database
 	private static String dburl = "jdbc:mysql://155.69.146.44:3306/socialtv";
 	// This is the username of the database
@@ -59,7 +57,7 @@ public class Indexer {
 		return con;
 	}
 
-	private static void addDocument(ResultSet rs, OpenMode om) {
+	private static void addDocument(ResultSet rs, OpenMode om, String indexPath) {
 
 		Directory indexDir = null;
 		IndexWriter indexWriter = null;
@@ -148,7 +146,7 @@ public class Indexer {
 
 	// This static method is called when user wants to index one new video's
 	// information with its id.
-	public static void indexOneDoc(JSONObject json) {
+	public static void indexOneDoc(JSONObject json, String indexPath) {
 		// Construct database query
 		String id = null;
 		try {
@@ -168,7 +166,7 @@ public class Indexer {
 			ResultSet rs = stmt.executeQuery(dbquery);
 			// We want to add the information of the video to the index, so the
 			// OpenMoode should be APPEND.
-			addDocument(rs, OpenMode.APPEND);
+			addDocument(rs, OpenMode.APPEND, indexPath);
 
 			rs.close();
 			stmt.close();
@@ -182,7 +180,7 @@ public class Indexer {
 
 	// This static method is called when user wants to reindex all videos'
 	// information.
-	public static void indexAllDocs() {
+	public static void indexAllDocs(String indexPath) {
 		// Construct database query
 		String dbquery = "SELECT " + "id, " + "title, " + "owner_id, "
 				+ "category_id," + "creation_time," + "update_time,"
@@ -194,7 +192,7 @@ public class Indexer {
 			Statement stmt = con.createStatement();
 			ResultSet rs = stmt.executeQuery(dbquery);
 			// We want to recreate an index, so the OpenMode should be CREATE.
-			addDocument(rs, OpenMode.CREATE);
+			addDocument(rs, OpenMode.CREATE, indexPath);
 
 			rs.close();
 			stmt.close();

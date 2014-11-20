@@ -1,6 +1,7 @@
 package newpackage;
 
 import java.io.IOException;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -30,6 +31,8 @@ public class _indexalldocs extends HttpServlet {
 	protected void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
+		doPost(request, response);
+		
 	}
 
 	/**
@@ -38,9 +41,16 @@ public class _indexalldocs extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		Indexer.indexAllDocs();
-		Suggester.indexSpellCheker();
+		
+		//Get index path and spell checker index path
+		String rootPath = getServletContext().getRealPath("");
+		String indexPath = rootPath + "/WEB-INF/index_files/index";
+		String spellCheckerIndexPath = rootPath + "/WEB-INF/index_files/spellCheckerIndex";
+		String spellCheckerDicPath = rootPath + "/WEB-INF/index_files/spellCheckerDic/4000-most-common-english-words-csv.csv";
+		
+		//index all files
+		Indexer.indexAllDocs(indexPath);
+		Suggester.indexSpellCheker(spellCheckerDicPath, spellCheckerIndexPath);
 	}
 
 }

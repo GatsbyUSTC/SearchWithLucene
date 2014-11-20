@@ -26,14 +26,18 @@ import org.wltea.analyzer.lucene.IKAnalyzer;
 
 public class Searcher {
 
-	private static String indexPath = Indexer.indexPath;
+	
 	// When searching, there is a default max response count, I make it 500.
 	private static final int DEFAULTRESPONSECOUNT = 500;
-
+	
+	private String indexPath;
+	private String spellCheckerIndexPath;
 	private JSONObject requestJson;
 	private JSONObject responseJson;
 
-	public Searcher(JSONObject json) {
+	public Searcher(JSONObject json, String iP, String sCIP) {
+		indexPath = iP;
+		spellCheckerIndexPath = sCIP;
 		requestJson = json;
 		responseJson = new JSONObject();
 	}
@@ -137,7 +141,7 @@ public class Searcher {
 
 			// When there is few hits, we generate some suggest words
 			if (responseCount < 3) {
-				String[] sugWrods = Suggester.suggestSpellChecker(keywords);
+				String[] sugWrods = Suggester.suggestSpellChecker(keywords, spellCheckerIndexPath);
 
 				JSONArray jsonArray = new JSONArray();
 				for (String string : sugWrods) {

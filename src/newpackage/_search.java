@@ -3,6 +3,7 @@ package newpackage;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -43,29 +44,33 @@ public class _search extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-
-		// Set response content type and get response writer.
-		response.setContentType("application/json; charset=UTF-8");
-		PrintWriter out = response.getWriter();
-
+		
+		//Get index path and spell checker index path
+		String rootPath = getServletContext().getRealPath("");
+		String indexPath = rootPath + "/WEB-INF/index_files/index";
+		String spellCheckerIndexPath = rootPath + "/WEB-INF/index_files/spellCheckerIndex";
+		
 		// Get request and parse it to JSON
 		StringBuffer jb = new StringBuffer();
 		BufferedReader reader = request.getReader();
 		String line = null;
 		while ((line = reader.readLine()) != null)
 			jb.append(line);
-
+		JSONObject requestJson = null;
 		try {
-
+			 requestJson = new JSONObject(jb.toString());
 			// search and output the results
-			Searcher indexSearcher = new Searcher(new JSONObject(jb.toString()));
-			out.print(indexSearcher.getResponse());
-
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		//construct Searcher
+		Searcher indexSearcher = new Searcher(requestJson, indexPath, spellCheckerIndexPath);
+		
+		// Set response content type and get response writer.
+		response.setContentType("application/json; charset=UTF-8");
+		PrintWriter out = response.getWriter();
+		out.print(indexSearcher.getResponse());
 	}
-
 }

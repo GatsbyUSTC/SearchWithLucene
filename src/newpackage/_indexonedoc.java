@@ -2,6 +2,7 @@ package newpackage;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -33,7 +34,8 @@ public class _indexonedoc extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
+		doPost(request, response);
+		
 	}
 
 	/**
@@ -42,22 +44,27 @@ public class _indexonedoc extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 
+		//Get index path and spell checker index path
+		String rootPath = getServletContext().getRealPath("");
+		String indexPath = rootPath + "/WEB-INF/index_files/index";
+				
 		// Get request and parse it to JSON
 		StringBuffer jb = new StringBuffer();
 		BufferedReader reader = request.getReader();
 		String line = null;
 		while ((line = reader.readLine()) != null)
 			jb.append(line);
-		
-		
+		JSONObject requestJson = null;
 		try {
-			Indexer.indexOneDoc(new JSONObject(jb.toString()));
+			requestJson = new JSONObject(jb.toString());
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		//index the document
+		Indexer.indexOneDoc(requestJson, indexPath);
 	}
 
 }

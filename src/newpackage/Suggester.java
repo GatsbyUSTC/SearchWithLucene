@@ -15,14 +15,9 @@ import org.wltea.analyzer.lucene.IKAnalyzer;
 public class Suggester {
 	// Make a default suggestion number
 	private static int suggestionNum = 5;
-	// Spell Checker Index Path
-	private static String spellCheckerIndexPath = "/home/hongwei/workspace/stvsearch/spellcheck";
-	// Spell Checker Dictionary Path
-	private static String spellCheckerDictPath = "/home/hongwei/workspace/stvsearch/spellcheckdic/4000-most-common-english-words-csv.csv";
-
+	
 	// This method is used to index spell checker dictionary
-	public static void indexSpellCheker() {
-
+	public static void indexSpellCheker(String spellCheckerDictPath, String spellCheckerIndexPath) {
 		try {
 			Directory dir = FSDirectory.open(new File(spellCheckerIndexPath));
 			SpellChecker spellChecker = new SpellChecker(dir);
@@ -39,7 +34,7 @@ public class Suggester {
 	}
 
 	// This method is used to provide suggestions based on the origin word.
-	public static String[] suggestSpellChecker(String originWord) {
+	public static String[] suggestSpellChecker(String originWord, String spellCheckerIndexPath) {
 
 		String[] suggestionWords = null;
 		SpellChecker spellChecker = null;
