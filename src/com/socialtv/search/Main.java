@@ -1,4 +1,4 @@
-package newpackage;
+package com.socialtv.search;
 
 //This is a temporary class used to create index. 
 public class Main {

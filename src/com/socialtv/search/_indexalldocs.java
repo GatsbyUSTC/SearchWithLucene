@@ -1,8 +1,6 @@
-package newpackage;
+package com.socialtv.search;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.PrintWriter;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -10,20 +8,18 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 /**
- * Servlet implementation class _search This Servlet is called when searching.
+ * Servlet implementation class _indexalldocs This Servlet is called when all
+ * videos' information needs to be re-indexed.
  */
-@WebServlet("/_search")
-public class _search extends HttpServlet {
+@WebServlet("/_indexalldocs")
+public class _indexalldocs extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
-	public _search() {
+	public _indexalldocs() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
@@ -36,6 +32,7 @@ public class _search extends HttpServlet {
 			HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		doPost(request, response);
+		
 	}
 
 	/**
@@ -49,28 +46,11 @@ public class _search extends HttpServlet {
 		String rootPath = getServletContext().getRealPath("");
 		String indexPath = rootPath + "/WEB-INF/index_files/index";
 		String spellCheckerIndexPath = rootPath + "/WEB-INF/index_files/spellCheckerIndex";
+		String spellCheckerDicPath = rootPath + "/WEB-INF/index_files/spellCheckerDic/4000-most-common-english-words-csv.csv";
 		
-		// Get request and parse it to JSON
-		StringBuffer jb = new StringBuffer();
-		BufferedReader reader = request.getReader();
-		String line = null;
-		while ((line = reader.readLine()) != null)
-			jb.append(line);
-		JSONObject requestJson = null;
-		try {
-			 requestJson = new JSONObject(jb.toString());
-			// search and output the results
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		//construct Searcher
-		Searcher indexSearcher = new Searcher(requestJson, indexPath, spellCheckerIndexPath);
-		
-		// Set response content type and get response writer.
-		response.setContentType("application/json; charset=UTF-8");
-		PrintWriter out = response.getWriter();
-		out.print(indexSearcher.getResponse());
+		//index all files
+		Indexer.indexAllDocs(indexPath);
+		Suggester.indexSpellCheker(spellCheckerDicPath, spellCheckerIndexPath);
 	}
+
 }

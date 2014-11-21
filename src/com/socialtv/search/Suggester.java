@@ -1,4 +1,4 @@
-package newpackage;
+package com.socialtv.search;
 
 import java.io.File;
 import java.io.IOException;
