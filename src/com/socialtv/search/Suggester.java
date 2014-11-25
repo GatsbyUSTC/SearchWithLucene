@@ -1,8 +1,6 @@
 package com.socialtv.search;
 
 import java.io.File;
-import java.io.IOException;
-
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.search.spell.LuceneLevenshteinDistance;
 import org.apache.lucene.search.spell.PlainTextDictionary;
@@ -14,11 +12,11 @@ import org.wltea.analyzer.lucene.IKAnalyzer;
 
 public class Suggester {
 	// Make a default suggestion number
-	private static int suggestionNum = 5;
-	
+	private static final int suggestionNum = 5;
+
 	// This method is used to index spell checker dictionary
-	public static void indexSpellCheker(String spellCheckerDictPath, String spellCheckerIndexPath) {
-		try {
+	public static void indexSpellCheker(String spellCheckerDictPath, String spellCheckerIndexPath) throws Exception{
+
 			Directory dir = FSDirectory.open(new File(spellCheckerIndexPath));
 			SpellChecker spellChecker = new SpellChecker(dir);
 			IndexWriterConfig iwc = new IndexWriterConfig(Version.LATEST,
@@ -27,29 +25,20 @@ public class Suggester {
 					spellCheckerDictPath)), iwc, false);
 			spellChecker.close();
 			dir.close();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 
 	// This method is used to provide suggestions based on the origin word.
-	public static String[] suggestSpellChecker(String originWord, String spellCheckerIndexPath) {
+	public static String[] suggestSpellChecker(String originWord,
+			String spellCheckerIndexPath) throws Exception {
 
 		String[] suggestionWords = null;
 		SpellChecker spellChecker = null;
-		try {
-			Directory dir = FSDirectory.open(new File(spellCheckerIndexPath));
-			spellChecker = new SpellChecker(dir,
-					new LuceneLevenshteinDistance());
-			suggestionWords = spellChecker.suggestSimilar(originWord,
-					suggestionNum);
-			spellChecker.close();
-			dir.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		Directory dir = FSDirectory.open(new File(spellCheckerIndexPath));
+		spellChecker = new SpellChecker(dir, new LuceneLevenshteinDistance());
+		suggestionWords = spellChecker
+				.suggestSimilar(originWord, suggestionNum);
+		spellChecker.close();
+		dir.close();
 		return suggestionWords;
 	}
 

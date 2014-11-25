@@ -1,13 +1,11 @@
 package com.socialtv.search;
 
 import java.io.File;
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field.Store;
@@ -35,32 +33,25 @@ public class Indexer {
 	// This is the password of the database
 	private static String password = "SocialTV";
 
+
 	public Indexer() {
 
 	}
 
-	private static Connection connectToDatabase() { // Our data comes from a
-													// remote database. This
-													// method is used to make a
-													// connection.
-		Connection con = null;
-		try {
-			// Before get connection, the mysql driver should be registered
-			// first.
-			DriverManager.registerDriver(new Driver());
-			// Get the connection
-			con = DriverManager.getConnection(dburl, username, password);
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	// This method is used to get a Connection from database
+	private static Connection connectToDatabase() throws SQLException {
+		// Before get connection, the mysql driver should be registered
+		// first.
+		DriverManager.registerDriver(new Driver());
+		// Get the connection
+		Connection con = DriverManager.getConnection(dburl, username, password);
+		
 		return con;
 	}
 
-	private static void addDocument(ResultSet rs, OpenMode om, String indexPath) {
+	private static void addDocument(ResultSet rs, OpenMode om, String indexPath)
+			throws Exception {
 
-		Directory indexDir = null;
-		IndexWriter indexWriter = null;
 		// IKanalyzer is a good analyzer for both Chinese and English.
 		Analyzer analyzer = new IKAnalyzer(true);
 		// This IndexWriterConfig is used to specify the version and analyzer.
@@ -69,90 +60,81 @@ public class Indexer {
 		// chosen.
 		iwc.setOpenMode(om);
 
-		try {
-			indexDir = FSDirectory.open(new File(indexPath));
-			// After several configurations, we can create a IndexWriter now.
-			indexWriter = new IndexWriter(indexDir, iwc);
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+		Directory indexDir = FSDirectory.open(new File(indexPath));
+		// After several configurations, we can create a IndexWriter now.
+		IndexWriter indexWriter = new IndexWriter(indexDir, iwc);
 
 		String id = null, title = null, owner_id = null, category_id = null, description = null, creation_time = null;
 		// String update_time = null, status = null, rating_total = null,
 		// rating_count = null, video_info = null, check_sum = null;
 		long watch_count = 0, tempTime = 0;
 		int tempDate = 0;
-		try {
-			// Get some key attributes from ResultSet.
-			// For the output of database is "UTF-8", we need to make some
-			// transcoding here.
-			while (rs.next()) {
 
-				id = rs.getString("id");
+		// Get some key attributes from ResultSet.
+		// For the output of database is "UTF-8", we need to make some
+		// transcoding here.
+		while (rs.next()) {
 
-				byte[] tempTitle = rs.getBytes("title");
-				title = new String(tempTitle, "UTF-8");
+			id = rs.getString("id");
 
-				owner_id = rs.getString("owner_id") == null ? "0" : rs
-						.getString("owner_id");
+			byte[] tempTitle = rs.getBytes("title");
+			title = new String(tempTitle, "UTF-8");
 
-				category_id = rs.getString("category_id");
-				watch_count = rs.getLong("watch_count");
+			owner_id = rs.getString("owner_id") == null ? "0" : rs
+					.getString("owner_id");
 
-				byte[] tempDescription = rs.getBytes("description");
-				description = new String(tempDescription, "UTF-8");
+			category_id = rs.getString("category_id");
+			watch_count = rs.getLong("watch_count");
 
-				creation_time = rs.getString("creation_time");
-				tempDate = Integer.parseInt(creation_time.substring(0, 4)
-						+ creation_time.substring(5, 7)
-						+ creation_time.substring(8, 10));
-				tempTime = Long.parseLong(creation_time.substring(0, 4)
-						+ creation_time.substring(5, 7)
-						+ creation_time.substring(8, 10)
-						+ creation_time.substring(11, 13)
-						+ creation_time.substring(14, 16)
-						+ creation_time.substring(17, 19));
+			byte[] tempDescription = rs.getBytes("description");
+			description = new String(tempDescription, "UTF-8");
 
-				// Create a new Document for each video's information.
-				Document doc = new Document();
-				doc.add(new TextField("id", id, Store.YES));
+			creation_time = rs.getString("creation_time");
+			tempDate = Integer.parseInt(creation_time.substring(0, 4)
+					+ creation_time.substring(5, 7)
+					+ creation_time.substring(8, 10));
+			tempTime = Long.parseLong(creation_time.substring(0, 4)
+					+ creation_time.substring(5, 7)
+					+ creation_time.substring(8, 10)
+					+ creation_time.substring(11, 13)
+					+ creation_time.substring(14, 16)
+					+ creation_time.substring(17, 19));
 
-				// As the title is more important than description, the title
-				// field boost is set as 2.0 here.
-				TextField titleField = new TextField("title", title, Store.YES);
-				titleField.setBoost(2.0f);
-				doc.add(titleField);
+			// Create a new Document for each video's information.
+			Document doc = new Document();
+			doc.add(new TextField("id", id, Store.YES));
 
-				// Add all fields of a video to the document
-				doc.add(new TextField("owner_id", owner_id, Store.YES));
-				doc.add(new TextField("category_id", category_id, Store.YES));
-				doc.add(new TextField("creation_time", creation_time, Store.YES));
-				doc.add(new LongField("watch_count", watch_count, Store.YES));
-				doc.add(new TextField("description", description, Store.YES));
-				doc.add(new IntField("tempDate", tempDate, Store.YES));
-				doc.add(new LongField("tempTime", tempTime, Store.YES));
+			// As the title is more important than description, the title
+			// field boost is set as 2.0 here.
+			TextField titleField = new TextField("title", title, Store.YES);
+			titleField.setBoost(2.0f);
+			doc.add(titleField);
 
-				// Index the video using IndexWriter.
-				indexWriter.addDocument(doc);
-			}
-			indexWriter.close();
-		} catch (NumberFormatException | SQLException | IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			// Add all fields of a video to the document
+			doc.add(new TextField("owner_id", owner_id, Store.YES));
+			doc.add(new TextField("category_id", category_id, Store.YES));
+			doc.add(new TextField("creation_time", creation_time, Store.YES));
+			doc.add(new LongField("watch_count", watch_count, Store.YES));
+			doc.add(new TextField("description", description, Store.YES));
+			doc.add(new IntField("tempDate", tempDate, Store.YES));
+			doc.add(new LongField("tempTime", tempTime, Store.YES));
+
+			// Index the video using IndexWriter.
+			indexWriter.addDocument(doc);
 		}
+		indexWriter.close();
 
 	}
 
 	// This static method is called when user wants to index one new video's
 	// information with its id.
 	public static void indexOneDoc(JSONObject json, String indexPath) {
+
 		// Construct database query
 		String id = null;
 		try {
 			id = json.getString("id");
 		} catch (JSONException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		String dbquery = "SELECT " + "id, " + "title, " + "owner_id, "
@@ -160,8 +142,9 @@ public class Indexer {
 				+ "watch_count," + "status," + "description," + "rating_total,"
 				+ "rating_count," + "video_info," + "checksum FROM content"
 				+ " WHERE id = '" + id + "'";
-		Connection con = connectToDatabase();
+
 		try {
+			Connection con = connectToDatabase();
 			Statement stmt = con.createStatement();
 			ResultSet rs = stmt.executeQuery(dbquery);
 			// We want to add the information of the video to the index, so the
@@ -171,24 +154,24 @@ public class Indexer {
 			rs.close();
 			stmt.close();
 			con.close();
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 	}
 
 	// This static method is called when user wants to reindex all videos'
 	// information.
-	public static void indexAllDocs(String indexPath) {
+	public static void indexAllDocs(String indexPath, String spellCheckerDictPath, String spellCheckerIndexPath) {
+
 		// Construct database query
 		String dbquery = "SELECT " + "id, " + "title, " + "owner_id, "
 				+ "category_id," + "creation_time," + "update_time,"
 				+ "watch_count," + "status," + "description," + "rating_total,"
 				+ "rating_count," + "video_info," + "checksum FROM content";
 
-		Connection con = connectToDatabase();
 		try {
+			Connection con = connectToDatabase();
 			Statement stmt = con.createStatement();
 			ResultSet rs = stmt.executeQuery(dbquery);
 			// We want to recreate an index, so the OpenMode should be CREATE.
@@ -197,10 +180,12 @@ public class Indexer {
 			rs.close();
 			stmt.close();
 			con.close();
-		} catch (SQLException e) {
+			Suggester.indexSpellCheker(spellCheckerDictPath, spellCheckerIndexPath);
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
 	}
 
 }
