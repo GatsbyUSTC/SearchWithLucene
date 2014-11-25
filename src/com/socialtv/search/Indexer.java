@@ -149,7 +149,8 @@ public class Indexer {
 			ResultSet rs = stmt.executeQuery(dbquery);
 			// We want to add the information of the video to the index, so the
 			// OpenMoode should be APPEND.
-			addDocument(rs, OpenMode.APPEND, indexPath);
+			if(!rs.wasNull())
+				addDocument(rs, OpenMode.APPEND, indexPath);
 
 			rs.close();
 			stmt.close();

@@ -96,8 +96,8 @@ public class _search extends HttpServlet {
 			requestJson = new JSONObject(jb.toString());
 		} catch (JSONException e) {
 			try {
-				jsonObject.append("status", "fail");
-				jsonObject.append("info", e.getLocalizedMessage());
+				jsonObject.put("status", "fail");
+				jsonObject.put("info", "json_error");
 			} catch (JSONException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -109,8 +109,8 @@ public class _search extends HttpServlet {
 		// See if the directory is locked
 		if (IndexWriter.isLocked(FSDirectory.open(new File(indexPath)))) {
 			try {
-				jsonObject.append("status", "fail");
-				jsonObject.append("info", "index_locked");
+				jsonObject.put("status", "fail");
+				jsonObject.put("info", "index_locked");
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

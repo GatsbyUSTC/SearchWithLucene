@@ -96,8 +96,8 @@ public class _indexonedoc extends HttpServlet {
 		} catch (JSONException e) {
 			// See if Json fail
 			try {
-				jsonObject.append("status", "fail");
-				jsonObject.append("info", "json_exception");
+				jsonObject.put("status", "fail");
+				jsonObject.put("info", "json_error");
 			} catch (JSONException e1) {
 				logger.severe(e1.getLocalizedMessage());
 			}
@@ -109,8 +109,8 @@ public class _indexonedoc extends HttpServlet {
 		// writing
 		if (IndexWriter.isLocked(FSDirectory.open(new File(indexPath)))) {
 			try {
-				jsonObject.append("status", "fail");
-				jsonObject.append("info", "index_locked");
+				jsonObject.put("status", "fail");
+				jsonObject.put("info", "index_locked");
 			} catch (JSONException e) {
 				logger.severe(e.getLocalizedMessage());
 			}
@@ -123,7 +123,7 @@ public class _indexonedoc extends HttpServlet {
 
 		// Output a success information
 		try {
-			jsonObject.append("status", "success");
+			jsonObject.put("status", "success");
 		} catch (JSONException e) {
 			logger.severe(e.getLocalizedMessage());
 		}

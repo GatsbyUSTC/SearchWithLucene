@@ -92,8 +92,8 @@ public class _indexalldocs extends HttpServlet {
 		// writing
 		if (IndexWriter.isLocked(FSDirectory.open(new File(indexPath)))) {
 			try {
-				jsonObject.append("status", "fail");
-				jsonObject.append("info", "index_locked");
+				jsonObject.put("status", "fail");
+				jsonObject.put("info", "index_locked");
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				logger.severe(e.getLocalizedMessage());
@@ -109,7 +109,7 @@ public class _indexalldocs extends HttpServlet {
 
 		// Return success
 		try {
-			jsonObject.append("status", "success");
+			jsonObject.put("status", "success");
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			logger.severe(e.getLocalizedMessage());

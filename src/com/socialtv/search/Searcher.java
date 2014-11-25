@@ -146,12 +146,7 @@ public class Searcher {
 			if (responseCount < 3) {
 				String[] sugWrods = Suggester.suggestSpellChecker(keywords,
 						spellCheckerIndexPath);
-
-				JSONArray jsonArray = new JSONArray();
-				for (String string : sugWrods) {
-					jsonArray.put(string);
-				}
-				responseJson.put("suggestWords", jsonArray);
+				responseJson.put("suggestWords", sugWrods);
 			}
 
 			responseJson.put("responseCount", responseCount);
