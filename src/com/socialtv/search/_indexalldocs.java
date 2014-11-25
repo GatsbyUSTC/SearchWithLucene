@@ -3,7 +3,12 @@ package com.socialtv.search;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.logging.FileHandler;
+import java.util.logging.Handler;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -23,12 +28,34 @@ import org.json.JSONObject;
 public class _indexalldocs extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
+	// Create indexlog logger
+	private static final Logger logger = Logger.getLogger("indexlog");
+	private String rootPath;
+
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
 	public _indexalldocs() {
 		super();
 		// TODO Auto-generated constructor stub
+	}
+
+	public void init(ServletConfig config) throws ServletException {
+		super.init(config);
+
+		// Get root path
+		rootPath = config.getServletContext().getRealPath("");
+		String logPath = rootPath + "/WEB-INF/log/index.log";
+
+		// Redirect the logger to a file handler
+		Handler fh = null;
+		try {
+			fh = new FileHandler(logPath, true);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		LogManager.getLogManager().reset();
+		logger.addHandler(fh);
 	}
 
 	/**
@@ -50,47 +77,46 @@ public class _indexalldocs extends HttpServlet {
 			HttpServletResponse response) throws ServletException, IOException {
 
 		// Get index path and spell checker index path
-		String rootPath = getServletContext().getRealPath("");
 		String indexPath = rootPath + "/WEB-INF/index_files/index";
 		String spellCheckerIndexPath = rootPath
 				+ "/WEB-INF/index_files/spellCheckerIndex";
 		String spellCheckerDictPath = rootPath
 				+ "/WEB-INF/index_files/spellCheckerDic/4000-most-common-english-words-csv.csv";
 
-
 		// Set response configuration
 		response.setContentType("application/json; charset=UTF-8");
 		PrintWriter out = response.getWriter();
 		JSONObject jsonObject = new JSONObject();
-		
-		//See if the directory is locked which means another IndexWriter is writing
-		if(IndexWriter.isLocked(FSDirectory.open(new File(indexPath)))){
+
+		// See if the directory is locked which means another IndexWriter is
+		// writing
+		if (IndexWriter.isLocked(FSDirectory.open(new File(indexPath)))) {
 			try {
 				jsonObject.append("status", "fail");
 				jsonObject.append("info", "index_locked");
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.severe(e.getLocalizedMessage());
 			}
 			out.print(jsonObject.toString());
-			return ;
+			return;
 		}
-		
+
 		// Create a new thread to do the index process
 		IndexThread indexThread = new IndexThread(indexPath,
 				spellCheckerIndexPath, spellCheckerDictPath);
 		Thread thread = new Thread(indexThread);
 
-		//Return success
+		// Return success
 		try {
 			jsonObject.append("status", "success");
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.severe(e.getLocalizedMessage());
 		}
 		out.print(jsonObject.toString());
-		
-		//Start the thread
+
+		// Start the thread
 		thread.start();
 	}
 

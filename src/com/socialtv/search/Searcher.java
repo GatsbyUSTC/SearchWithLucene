@@ -2,6 +2,8 @@ package com.socialtv.search;
 
 import java.io.File;
 import java.sql.Date;
+import java.util.logging.Logger;
+
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.Term;
@@ -25,6 +27,8 @@ import org.wltea.analyzer.lucene.IKAnalyzer;
 
 public class Searcher {
 
+	// Get searchlog logger
+	private static final Logger logger = Logger.getLogger("searchlog");
 	// When searching, there is a default max response count, I make it 500.
 	private static final int DEFAULTRESPONSECOUNT = 500;
 
@@ -32,7 +36,6 @@ public class Searcher {
 	private String spellCheckerIndexPath;
 	private JSONObject requestJson;
 	private JSONObject responseJson;
-
 
 	public Searcher(JSONObject json, String iP, String sCIP) {
 		indexPath = iP;
@@ -42,7 +45,7 @@ public class Searcher {
 	}
 
 	private void search() {
-		
+
 		// The fields we want to search.
 		String[] fields = { "title", "description" };
 		try {
@@ -163,7 +166,7 @@ public class Searcher {
 			}
 			responseJson.put("data", data);
 		} catch (Exception e) { /* report an error */
-			e.printStackTrace();
+			logger.severe(e.getLocalizedMessage());
 		}
 	}
 

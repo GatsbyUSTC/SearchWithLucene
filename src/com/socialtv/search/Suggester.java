@@ -15,16 +15,17 @@ public class Suggester {
 	private static final int suggestionNum = 5;
 
 	// This method is used to index spell checker dictionary
-	public static void indexSpellCheker(String spellCheckerDictPath, String spellCheckerIndexPath) throws Exception{
+	public static void indexSpellCheker(String spellCheckerDictPath,
+			String spellCheckerIndexPath) throws Exception {
 
-			Directory dir = FSDirectory.open(new File(spellCheckerIndexPath));
-			SpellChecker spellChecker = new SpellChecker(dir);
-			IndexWriterConfig iwc = new IndexWriterConfig(Version.LATEST,
-					new IKAnalyzer(true));
-			spellChecker.indexDictionary(new PlainTextDictionary(new File(
-					spellCheckerDictPath)), iwc, false);
-			spellChecker.close();
-			dir.close();
+		Directory dir = FSDirectory.open(new File(spellCheckerIndexPath));
+		SpellChecker spellChecker = new SpellChecker(dir);
+		IndexWriterConfig iwc = new IndexWriterConfig(Version.LATEST,
+				new IKAnalyzer(true));
+		spellChecker.indexDictionary(new PlainTextDictionary(new File(
+				spellCheckerDictPath)), iwc, false);
+		spellChecker.close();
+		dir.close();
 	}
 
 	// This method is used to provide suggestions based on the origin word.

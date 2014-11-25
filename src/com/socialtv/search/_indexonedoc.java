@@ -4,7 +4,12 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.logging.FileHandler;
+import java.util.logging.Handler;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -24,12 +29,34 @@ import org.json.JSONObject;
 public class _indexonedoc extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
+	// Create the indexlog logger
+	private static final Logger logger = Logger.getLogger("indexlog");
+	private String rootPath;
+
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
 	public _indexonedoc() {
 		super();
 		// TODO Auto-generated constructor stub
+	}
+
+	public void init(ServletConfig config) throws ServletException {
+		super.init(config);
+
+		// Get root path
+		rootPath = config.getServletContext().getRealPath("");
+		String logPath = rootPath + "/WEB-INF/log/index.log";
+
+		// Redirect the logger to a file handler
+		Handler fh = null;
+		try {
+			fh = new FileHandler(logPath, true);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		LogManager.getLogManager().reset();
+		logger.addHandler(fh);
 	}
 
 	/**
@@ -50,10 +77,9 @@ public class _indexonedoc extends HttpServlet {
 			HttpServletResponse response) throws ServletException, IOException {
 
 		// Get index path and spell checker index path
-		String rootPath = getServletContext().getRealPath("");
 		String indexPath = rootPath + "/WEB-INF/index_files/index";
 
-		//Set response configuration
+		// Set response configuration
 		response.setContentType("application/json; charset=UTF-8");
 		PrintWriter out = response.getWriter();
 		JSONObject jsonObject = new JSONObject();
@@ -68,38 +94,38 @@ public class _indexonedoc extends HttpServlet {
 		try {
 			requestJson = new JSONObject(jb.toString());
 		} catch (JSONException e) {
-			//See if Json fail
+			// See if Json fail
 			try {
 				jsonObject.append("status", "fail");
-				jsonObject.append("info", e.getLocalizedMessage());
+				jsonObject.append("info", "json_exception");
 			} catch (JSONException e1) {
-				e1.printStackTrace();
+				logger.severe(e1.getLocalizedMessage());
 			}
 			out.print(jsonObject.toString());
 			return;
 		}
 
-		//See if the directory is locked which means another IndexWriter is writing
-		if(IndexWriter.isLocked(FSDirectory.open(new File(indexPath)))){
+		// See if the directory is locked which means another IndexWriter is
+		// writing
+		if (IndexWriter.isLocked(FSDirectory.open(new File(indexPath)))) {
 			try {
 				jsonObject.append("status", "fail");
 				jsonObject.append("info", "index_locked");
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.severe(e.getLocalizedMessage());
 			}
 			out.print(jsonObject.toString());
-			return ;
+			return;
 		}
-		
+
 		// Index the document
 		Indexer.indexOneDoc(requestJson, indexPath);
-		
+
 		// Output a success information
 		try {
 			jsonObject.append("status", "success");
 		} catch (JSONException e) {
-			e.printStackTrace();
+			logger.severe(e.getLocalizedMessage());
 		}
 		out.print(jsonObject.toString());
 	}

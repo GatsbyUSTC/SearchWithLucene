@@ -6,6 +6,8 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.logging.Logger;
+
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field.Store;
@@ -26,13 +28,14 @@ import com.mysql.jdbc.Driver;
 
 public class Indexer {
 
+	// Get the indexlog logger
+	private static final Logger logger = Logger.getLogger("indexlog");
 	// This is the java format url of the database
-	private static String dburl = "jdbc:mysql://155.69.146.44:3306/socialtv";
+	private static final String dburl = "jdbc:mysql://155.69.146.44:3306/socialtv";
 	// This is the username of the database
-	private static String username = "socialtv";
+	private static final String username = "socialtv";
 	// This is the password of the database
-	private static String password = "SocialTV";
-
+	private static final String password = "SocialTV";
 
 	public Indexer() {
 
@@ -45,7 +48,6 @@ public class Indexer {
 		DriverManager.registerDriver(new Driver());
 		// Get the connection
 		Connection con = DriverManager.getConnection(dburl, username, password);
-		
 		return con;
 	}
 
@@ -65,8 +67,6 @@ public class Indexer {
 		IndexWriter indexWriter = new IndexWriter(indexDir, iwc);
 
 		String id = null, title = null, owner_id = null, category_id = null, description = null, creation_time = null;
-		// String update_time = null, status = null, rating_total = null,
-		// rating_count = null, video_info = null, check_sum = null;
 		long watch_count = 0, tempTime = 0;
 		int tempDate = 0;
 
@@ -156,13 +156,14 @@ public class Indexer {
 			con.close();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.severe(e.getLocalizedMessage());
 		}
 	}
 
 	// This static method is called when user wants to reindex all videos'
 	// information.
-	public static void indexAllDocs(String indexPath, String spellCheckerDictPath, String spellCheckerIndexPath) {
+	public static void indexAllDocs(String indexPath,
+			String spellCheckerDictPath, String spellCheckerIndexPath) {
 
 		// Construct database query
 		String dbquery = "SELECT " + "id, " + "title, " + "owner_id, "
@@ -180,12 +181,10 @@ public class Indexer {
 			rs.close();
 			stmt.close();
 			con.close();
-			Suggester.indexSpellCheker(spellCheckerDictPath, spellCheckerIndexPath);
+			Suggester.indexSpellCheker(spellCheckerDictPath,
+					spellCheckerIndexPath);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.severe(e.getLocalizedMessage());
 		}
-
 	}
-
 }
