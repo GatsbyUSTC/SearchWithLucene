@@ -128,7 +128,7 @@ public class Indexer {
 
 	// This static method is called when user wants to index one new video's
 	// information with its id.
-	public static void indexOneDoc(JSONObject json, String indexPath) {
+	public static boolean indexOneDoc(JSONObject json, String indexPath) {
 
 		// Construct database query
 		String id = null;
@@ -149,16 +149,22 @@ public class Indexer {
 			ResultSet rs = stmt.executeQuery(dbquery);
 			// We want to add the information of the video to the index, so the
 			// OpenMoode should be APPEND.
-			if(!rs.wasNull())
+			if(rs.first()){
+				rs.beforeFirst();
 				addDocument(rs, OpenMode.APPEND, indexPath);
-
-			rs.close();
-			stmt.close();
-			con.close();
+				rs.close();
+				stmt.close();
+				con.close();
+			}else {
+				rs.close();
+				stmt.close();
+				con.close();
+				return false;
+			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			logger.severe(e.getLocalizedMessage());
 		}
+		return true;
 	}
 
 	// This static method is called when user wants to reindex all videos'

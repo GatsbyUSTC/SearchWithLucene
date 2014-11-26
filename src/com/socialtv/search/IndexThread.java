@@ -10,7 +10,7 @@ public class IndexThread implements Runnable {
 	private String spellCheckerIndexPath;
 	private String spellCheckerDictPath;
 
-	public IndexThread(String iP, String sCIP, String sCDP) {
+	public IndexThread(String iP, String sCDP, String sCIP) {
 		indexPath = iP;
 		spellCheckerIndexPath = sCIP;
 		spellCheckerDictPath = sCDP;

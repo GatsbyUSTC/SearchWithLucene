@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: stvsearch
+Bundle-SymbolicName: stvsearch
+Bundle-Version: 1.0.0.qualifier
+Bundle-ClassPath: stvsearch.jar,
+ hongwei/workspace/stvsearch/lib/org.json-20120521.jar,
+ hongwei/workspace/stvsearch/lib/lucene-4.10.2/suggest/lucene-suggest-4.10.2.jar,
+ hongwei/workspace/stvsearch/lib/lucene-4.10.2/core/lucene-core-4.10.2.jar,
+ hongwei/workspace/stvsearch/lib/lucene-4.10.2/queryparser/lucene-queryparser-4.10.2.jar,
+ hongwei/workspace/stvsearch/lib/lucene-4.10.2/queries/lucene-queries-4.10.2.jar,
+ hongwei/workspace/stvsearch/lib/lucene-4.10.2/analysis/common/lucene-analyzers-common-4.10.2.jar,
+ hongwei/workspace/stvsearch/lib/IK Analyzer 2012FF_hf1/IKAnalyzer2012FF_u1.jar,
+ hongwei/workspace/stvsearch/lib/mysql-connector-java-5.1.33-bin.jar
+Export-Package: com.socialtv.search

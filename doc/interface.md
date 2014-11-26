@@ -11,7 +11,7 @@ Interfaces: Now, there is three interfaces in total.
   - response parameter: 
    - {
    - "status":"fail" // sucess or fail
-   - "info":"index_locked" //opt,only status fail will show."index_locked" means there is another index writer writing the index.
+   - "info":"index_locked" //opt,only shows when status fail."index_locked" means there is another index writer writing the index.
    -  }   
   - response example preview:  
          {"status":"success"}

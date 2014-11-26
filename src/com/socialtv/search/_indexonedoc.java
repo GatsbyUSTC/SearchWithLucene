@@ -118,8 +118,18 @@ public class _indexonedoc extends HttpServlet {
 			return;
 		}
 
-		// Index the document
-		Indexer.indexOneDoc(requestJson, indexPath);
+		// Index the document, check if the id exists
+		if(!Indexer.indexOneDoc(requestJson, indexPath)){
+			try {
+				jsonObject.put("status", "fail");
+				jsonObject.put("info", "no_this_id");
+			} catch (JSONException e) {
+				logger.severe(e.getLocalizedMessage());
+			}
+			out.print(jsonObject.toString());
+			return;
+		}
+			
 
 		// Output a success information
 		try {

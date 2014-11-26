@@ -104,7 +104,7 @@ public class _indexalldocs extends HttpServlet {
 
 		// Create a new thread to do the index process
 		IndexThread indexThread = new IndexThread(indexPath,
-				spellCheckerIndexPath, spellCheckerDictPath);
+				spellCheckerDictPath, spellCheckerIndexPath);
 		Thread thread = new Thread(indexThread);
 
 		// Return success
