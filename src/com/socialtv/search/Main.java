@@ -1,6 +1,5 @@
 package com.socialtv.search;
 
-
 //This is a temporary class used to create index. 
 public class Main {
 
@@ -10,7 +9,8 @@ public class Main {
 		String spellCheckerIndexPath = "WebContent/WEB-INF/index_files/spellCheckerIndex";
 		long startTime = System.currentTimeMillis();
 		System.out.println("index write starts");
-		Indexer.indexAllDocs(indexPath, spellCheckerDictPath, spellCheckerIndexPath);
+		Indexer.indexAllDocs(indexPath, spellCheckerDictPath,
+				spellCheckerIndexPath);
 		long endTime = System.currentTimeMillis();
 		System.out.println("index write finishes");
 		System.out.println("total time: " + (endTime - startTime) + " ms");

@@ -1,7 +1,6 @@
 package com.socialtv.search;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.logging.FileHandler;
@@ -16,8 +15,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.store.FSDirectory;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -105,20 +102,6 @@ public class _search extends HttpServlet {
 			out.print(jsonObject.toString());
 			return;
 		}
-
-		// See if the directory is locked
-		if (IndexWriter.isLocked(FSDirectory.open(new File(indexPath)))) {
-			try {
-				jsonObject.put("status", "fail");
-				jsonObject.put("info", "index_locked");
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			out.print(jsonObject.toString());
-			return;
-		}
-
 		// construct Searcher
 		Searcher indexSearcher = new Searcher(requestJson, indexPath,
 				spellCheckerIndexPath);
