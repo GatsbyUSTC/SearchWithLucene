@@ -1,4 +1,4 @@
-Query Syntax:
+##Query Syntax:
 
 1.Fields:
 
@@ -41,4 +41,3 @@ Query Syntax:
   - The AND operator matches documents where both terms exist anywhere in the text of a single document.
   - The "+" or required operator requires that the term after the "+" symbol exist somewhere in a the field of a single document.
   - The NOT operator excludes documents that contain the term after NOT. 
-
