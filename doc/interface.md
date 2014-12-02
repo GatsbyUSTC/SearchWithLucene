@@ -4,12 +4,6 @@
   - url: 	IP:PORT/stvsearch/_indexalldocs
   - http verb :	POST
   - request parameter: 	none
-  - request example preview:
-```http
-POST /stvsearch/_indexalldocs HTTP/1.1
-Host: localhost:8080
-Cache-Control: no-cache
-```
   - response parameter: 
 ```js
 {
@@ -28,14 +22,6 @@ Cache-Control: no-cache
   - request parameter: 
 ```js
 {id: "c98cf336a4fa11e39aff74867ade5224" //str}
-```
-  - request example preview:
-```http
-POST /stvsearch/_indexonedoc HTTP/1.1
-Host: localhost:8080
-Cache-Control: no-cache
-
-{ id: "c98cf336a4fa11e39aff74867ade5224" }
 ```
   - response parameter: 
 ```js
@@ -68,11 +54,7 @@ sortWay: "s", 	//string, opt, s:relevant sort; t:create_time sort; v:watch_count
 }
 ```
   - request example preview:
-```http
-POST /stvsearch/_search HTTP/1.1
-Host: localhost:8080
-Cache-Control: no-cache
-
+```js
 { keywords: "千与千寻", startIndex: 0, requestCount: 20, inDays: 500, sortWay: "s" }
 ```
   - response parameter:
