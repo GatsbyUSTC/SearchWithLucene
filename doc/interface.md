@@ -1,4 +1,4 @@
-Interfaces: Now, there is three interfaces in total.
+##Interfaces: Now, there are three interfaces in total.
 
 1.The first interace is used to index all files. When first time used or the system crashes, this interface can be used to create new index files.
   - url: 	IP:PORT/stvsearch/_indexalldocs
