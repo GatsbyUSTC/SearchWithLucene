@@ -1,72 +1,91 @@
-##Interfaces: Now, there are three interfaces in total.
+##Interfaces Specification 
 
-1.The first interace is used to index all files. When first time used or the system crashes, this interface can be used to create new index files.
-  - url: 	IP:PORT/stvsearch/_indexalldocs
-  - http verb :	POST
-  - request parameter: 	none
-  - response parameter: 
+###Initial Index
+
+The first interface is used to index all files. When first time used or the system crashes, this interface can be used to create new index files.
+* **URL**
+/stvsearch/_indexalldocs
+
+* **Method**
+`POST`
+
+* **Parameter**
+`None`
+
+* **Response**
+    * **Code:** 200
+    * **Content:**
 ```js
 {
-"status":"fail" // sucess or fail
-"info":"index_locked" //opt,only shows when status fail."index_locked" means there is another index writer writing the index.
+    "status": "fail" // sucess or fail
+    "info": "index_locked" //opt,only shows when status fail."index_locked" means there is another index writer writing the index.
 }
 ```
-  - response example preview:
-```js
-{"status":"success"}
-```
 
-2.The second interface is used to index one specific document. In our project, when a new video is uploaded, its information needs to be indexed. This interface is used to do it.
-  - url: IP:PORT/stvsearch/_indexonedoc
-  - http verb: POST
-  - request parameter: 
+
+
+* **Notes**
+
+
+###Incremental Index
+
+The second interface is used to index one specific document. In our project, when a new video is uploaded, its information needs to be indexed. This interface is used to do it.
+
+* **URL**
+/stvsearch/_indexonedoc
+
+* **Method**
+`POST`
+
+* **Parameter**
 ```js
 {id: "c98cf336a4fa11e39aff74867ade5224" //str}
 ```
-  - response parameter: 
+
+* **Response**
+    * **Code:** 200
+    * **Content:**
 ```js
 {
-"status":"fail" // success or fail
-"info":"index_locked" // fail information
+    "status": "fail" // success or fail
+    "info": "index_locked" // fail information
 }
-```
-  - response example preview:
-```js
-{"status":"success"}
 ```
 
-3.The third interface is used to search.
-  - url:	IP:PORT/stvsearch/_search
-  - http verb: 	POST
-  - request parameter:
+* **Notes**
+
+###Search
+The third interface is used to search.
+
+* **URL**
+/stvsearch/_search
+
+* **Method**
+`POST`
+
+* **Parameter**
 ```js
 {
-keywords: "good",
-filter:
- {
- owner_id:"3",	//string, opt
- category_id:"3"	//string, opt
- },
-startIndex: 1, 	//int, opt, no less than zero
-requestCount: 20,	//int, opt
-inDays: 300, 	//int, opt, days after update
-sortWay: "s", 	//string, opt, s:relevant sort; t:create_time sort; v:watch_count sort;
+    keywords: "good",
+    filter: {
+        owner_id: "3", //string, opt
+        category_id: "3" //string, opt
+    },
+    startIndex: 1, //int, opt, no less than zero
+    requestCount: 20, //int, opt
+    inDays: 300, //int, opt, days after update
+    sortWay: "s", //string, opt, s:relevant sort; t:create_time sort; v:watch_count sort;
 }
 ```
-  - request example preview:
-```js
-{ keywords: "千与千寻", startIndex: 0, requestCount: 20, inDays: 500, sortWay: "s" }
-```
-  - response parameter:
+
+* **Response**
 ```js
 {
-reponseCount: 30,				//int
-data: [{id:"sfada"},...]		//json array
-suggestWords: [“a”,”b”,”c”,”d”] 	//json array,optioanl,only shows when responseCount < 3
+    reponseCount: 30, //int
+    data: [{
+            id: "sfada"
+        }, ...] //json array
+    suggestWords: [“a”, ”b”, ”c”, ”d”] //json array,optioanl,only shows when responseCount < 3
 }
 ```
-  - response example preview:
-```js
-{"data":[{"id":"c98cf336a4fa11e39aff74867ade5224","title":"千与千寻","description":"a good movie"},{"id":"366f0bacb62f11e38b1e74867ade5224","title":"千与千寻4","description":"enjoy this movie"},{"id":"c64eb82cb62e11e39b8974867ade5224","title":"千与千寻2","description":"enjoy this movie"},{"id":"f0cf62a4b62e11e38b1e74867ade5224","title":"千与千寻3","description":"enjoy this movie"}],
-"responseCount":4}
-```
+* **Note**
