@@ -43,7 +43,7 @@ public class _search extends HttpServlet {
 		// Get root path
 		rootPath = config.getServletContext().getRealPath("");
 		String logPath = rootPath + "/WEB-INF/log/search.log";
-
+		
 		// Redirect logger to a file handler
 		Handler fh = null;
 		try {

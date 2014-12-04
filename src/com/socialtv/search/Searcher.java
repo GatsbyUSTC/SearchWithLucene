@@ -25,6 +25,10 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.wltea.analyzer.lucene.IKAnalyzer;
 
+import sun.org.mozilla.javascript.json.JsonParser;
+
+import com.sun.org.apache.bcel.internal.generic.NEW;
+
 public class Searcher {
 
 	// Get searchlog logger
@@ -54,6 +58,7 @@ public class Searcher {
 			// With MultiFieldQueryPaser, we specify fields and analyzer
 			MultiFieldQueryParser mfqp = new MultiFieldQueryParser(fields,
 					new IKAnalyzer(true));
+			
 			// Get Query after parsing the keywords with the help of
 			// MultiFieldQueryParser.
 			Query query = mfqp.parse(keywords);
@@ -80,20 +85,14 @@ public class Searcher {
 			Filter inDaysFilter = null;
 			if (requestJson.has("inDays")) {
 				inDays = requestJson.getInt("inDays");
-				Date startDate = new Date(System.currentTimeMillis()
-						- (long) inDays * 24l * 3600l * 1000l);
-				String temp = startDate.toString();
-				int startTime = Integer.parseInt(temp.substring(0, 4)
-						+ temp.substring(5, 7) + temp.substring(8, 10));
-
-				Date endDate = new Date(System.currentTimeMillis());
-				temp = endDate.toString();
-				int endTime = Integer.parseInt(temp.substring(0, 4)
-						+ temp.substring(5, 7) + temp.substring(8, 10));
+				long startTime = System.currentTimeMillis()
+						- (long) inDays * 24l * 3600l * 1000l;
+		
+				long endTime = System.currentTimeMillis();
 
 				// Create a NumericRangeFilter when user specify the creation
 				// time.
-				inDaysFilter = NumericRangeFilter.newIntRange("tempDate",
+				inDaysFilter = NumericRangeFilter.newLongRange("tempDate",
 						startTime, endTime, true, true);
 			}
 
@@ -156,11 +155,19 @@ public class Searcher {
 			for (int i = startIndex; i < responseCount + startIndex; i++) {
 				Document doc = searcher.doc(hits[i].doc);
 				JSONObject json = new JSONObject();
-				json.put("id", doc.get("id"));
+				json.put("id", doc.get("content_id"));
+				json.put("title", doc.get("content_title"));
+				if (!(doc.get("content_video_info").equals(""))) {
+					JSONObject tempJson = new JSONObject(doc.get("content_video_info"));
+					json.put("length", tempJson.getJSONObject("format").getString("duration"));
+				} else {
+					json.put("length", "0");
+				}
 				data.put(json);
 			}
 			responseJson.put("data", data);
 		} catch (Exception e) { /* report an error */
+			e.printStackTrace();
 			logger.severe(e.getLocalizedMessage());
 		}
 	}
