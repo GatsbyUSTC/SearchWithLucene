@@ -1,7 +1,7 @@
 package com.socialtv.search;
 
 import java.io.File;
-import java.sql.Date;
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import org.apache.lucene.document.Document;
@@ -24,10 +24,6 @@ import org.apache.lucene.store.FSDirectory;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.wltea.analyzer.lucene.IKAnalyzer;
-
-import sun.org.mozilla.javascript.json.JsonParser;
-
-import com.sun.org.apache.bcel.internal.generic.NEW;
 
 public class Searcher {
 
@@ -150,13 +146,15 @@ public class Searcher {
 
 			responseJson.put("responseCount", responseCount);
 
+			ArrayList<String> fieldname = Indexer.getFields();
 			// Put all data into responseJson
 			JSONArray data = new JSONArray();
 			for (int i = startIndex; i < responseCount + startIndex; i++) {
 				Document doc = searcher.doc(hits[i].doc);
 				JSONObject json = new JSONObject();
-				json.put("id", doc.get("content_id"));
-				json.put("title", doc.get("content_title"));
+				for (int j = 0; j < fieldname.size(); j++) {
+					json.put(fieldname.get(j), doc.get(fieldname.get(j)));
+				}
 				if (!(doc.get("content_video_info").equals(""))) {
 					JSONObject tempJson = new JSONObject(doc.get("content_video_info"));
 					json.put("length", tempJson.getJSONObject("format").getString("duration"));

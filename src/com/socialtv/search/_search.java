@@ -105,7 +105,7 @@ public class _search extends HttpServlet {
 		// construct Searcher
 		Searcher indexSearcher = new Searcher(requestJson, indexPath,
 				spellCheckerIndexPath);
-		// Get response
+		// Get response 
 		out.print(indexSearcher.getResponse());
 	}
 }
