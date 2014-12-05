@@ -74,7 +74,7 @@ The third interface is used to search.
     startIndex: 1, //int, opt, no less than zero
     requestCount: 20, //int, opt
     inDays: 300, //int, opt, days after update
-    sortWay: "s", //string, opt, s:relevant sort; t:create_time sort; v:watch_count sort;
+    sortWay: "s", //string, opt, s:relevant sort; t:update_time sort; v:watch_count sort;
 }
 ```
 

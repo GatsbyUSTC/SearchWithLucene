@@ -88,7 +88,7 @@ public class Searcher {
 
 				// Create a NumericRangeFilter when user specify the creation
 				// time.
-				inDaysFilter = NumericRangeFilter.newLongRange("tempDate",
+				inDaysFilter = NumericRangeFilter.newLongRange("tempTime",
 						startTime, endTime, true, true);
 			}
 
@@ -101,7 +101,9 @@ public class Searcher {
 							true));
 				// Create a Sort when user specify a sort way.
 				else if (sortWay.equals("t"))
+					{
 					sort = new Sort(new SortField("tempTime", Type.LONG, true));
+					}
 			}
 
 			int startIndex = 0, requestCount = DEFAULTRESPONSECOUNT;

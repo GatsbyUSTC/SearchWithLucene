@@ -62,7 +62,8 @@ public class Indexer {
 		ArrayList<String> fields = new ArrayList<String>();
 		try {
 			DriverManager.registerDriver(new Driver());
-			Connection con = DriverManager.getConnection(dburl, username, password);
+			Connection con = DriverManager.getConnection(dburl, username,
+					password);
 			Statement stmt = con.createStatement();
 			ResultSet rs = stmt.executeQuery(dbquery);
 			ResultSetMetaData rsmt = rs.getMetaData();
@@ -70,12 +71,12 @@ public class Indexer {
 			for (int i = 1; i < rsmt.getColumnCount() + 1; i++) {
 				fields.add(rsmt.getColumnLabel(i));
 			}
-			
+
 			rs.close();
 			stmt.close();
 		} catch (SQLException e) {
 			logger.severe(e.getLocalizedMessage());
-		}	
+		}
 		return fields;
 	}
 
@@ -118,7 +119,6 @@ public class Indexer {
 		}
 		return true;
 	}
-
 
 	// This static method is called when user wants to reindex all videos'
 	// information.
@@ -206,7 +206,7 @@ public class Indexer {
 
 			// long field is used to filter and sort
 			doc.add(new LongField("watch_count", watch_count, Store.NO));
-			doc.add(new LongField("tempDate", tempTime, Store.NO));
+			doc.add(new LongField("tempTime", tempTime, Store.NO));
 
 			// stored field, not indexed ,stored
 			ResultSetMetaData rsmd = rs.getMetaData();
