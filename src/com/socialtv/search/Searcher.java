@@ -1,7 +1,7 @@
 package com.socialtv.search;
 
 import java.io.File;
-import java.sql.Date;
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import org.apache.lucene.document.Document;
@@ -54,6 +54,7 @@ public class Searcher {
 			// With MultiFieldQueryPaser, we specify fields and analyzer
 			MultiFieldQueryParser mfqp = new MultiFieldQueryParser(fields,
 					new IKAnalyzer(true));
+			
 			// Get Query after parsing the keywords with the help of
 			// MultiFieldQueryParser.
 			Query query = mfqp.parse(keywords);
@@ -80,20 +81,14 @@ public class Searcher {
 			Filter inDaysFilter = null;
 			if (requestJson.has("inDays")) {
 				inDays = requestJson.getInt("inDays");
-				Date startDate = new Date(System.currentTimeMillis()
-						- (long) inDays * 24l * 3600l * 1000l);
-				String temp = startDate.toString();
-				int startTime = Integer.parseInt(temp.substring(0, 4)
-						+ temp.substring(5, 7) + temp.substring(8, 10));
-
-				Date endDate = new Date(System.currentTimeMillis());
-				temp = endDate.toString();
-				int endTime = Integer.parseInt(temp.substring(0, 4)
-						+ temp.substring(5, 7) + temp.substring(8, 10));
+				long startTime = System.currentTimeMillis()
+						- (long) inDays * 24l * 3600l * 1000l;
+		
+				long endTime = System.currentTimeMillis();
 
 				// Create a NumericRangeFilter when user specify the creation
 				// time.
-				inDaysFilter = NumericRangeFilter.newIntRange("tempDate",
+				inDaysFilter = NumericRangeFilter.newLongRange("tempTime",
 						startTime, endTime, true, true);
 			}
 
@@ -106,7 +101,9 @@ public class Searcher {
 							true));
 				// Create a Sort when user specify a sort way.
 				else if (sortWay.equals("t"))
+					{
 					sort = new Sort(new SortField("tempTime", Type.LONG, true));
+					}
 			}
 
 			int startIndex = 0, requestCount = DEFAULTRESPONSECOUNT;
@@ -151,17 +148,27 @@ public class Searcher {
 
 			responseJson.put("responseCount", responseCount);
 
+			ArrayList<String> fieldname = Indexer.getFields();
 			// Put all data into responseJson
 			JSONArray data = new JSONArray();
 			for (int i = startIndex; i < responseCount + startIndex; i++) {
 				Document doc = searcher.doc(hits[i].doc);
 				System.out.print(doc);
 				JSONObject json = new JSONObject();
-				json.put("id", doc.get("id"));
+				for (int j = 0; j < fieldname.size(); j++) {
+					json.put(fieldname.get(j), doc.get(fieldname.get(j)));
+				}
+				if (!(doc.get("content_video_info").equals(""))) {
+					JSONObject tempJson = new JSONObject(doc.get("content_video_info"));
+					json.put("length", tempJson.getJSONObject("format").getString("duration"));
+				} else {
+					json.put("length", "0");
+				}
 				data.put(json);
 			}
 			responseJson.put("data", data);
 		} catch (Exception e) { /* report an error */
+			e.printStackTrace();
 			logger.severe(e.getLocalizedMessage());
 		}
 	}
