@@ -1,0 +1,29 @@
+{
+    "base": {
+        "local_name":       "service1",
+        "require_django":   true
+    }, "server": [
+        {
+            "package":  "connection",
+            "name":     "tcp",
+            "class":    "TCPServer"
+        },
+        {
+            "package":  "connection",
+            "name":     "xmpp",
+            "class":    "XmppConnection"
+        }
+    ], "message": [
+        "message.common",
+        "message.epg"
+    ], "endpoint": [
+        {
+            "type":     "tcp",
+            "enabled": "true",
+            "kwargs":   {
+                "local_addr":   "127.0.0.1",
+                "local_port":   7006
+            }
+        }
+    ]
+}

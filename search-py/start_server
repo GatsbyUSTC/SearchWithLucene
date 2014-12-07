@@ -1,0 +1,39 @@
+#!/bin/bash
+pushd `dirname $0` > /dev/null
+SCRIPTPATH=`pwd`
+popd > /dev/null
+
+usage(){
+    echo "$(basename $0) [-d|--debug|-i|--info|-w|--warn|-e|--error] [-c|--config config_file]"
+}
+
+start_serv(){
+    python $BASEDIR/service_base.py --$1 --log-format "%(asctime)s %(module)s(%(lineno)d) %(levelname)s %(funcName)s %(threadName)s: %(message)s"   \
+        --show-warnings --config-file $2 || echo '-----------------failed to start server-----------------'
+}
+
+BASEDIR=$SCRIPTPATH
+
+LEVEL='info'
+CONFIG_FILE='config.json'
+
+while [ "$1" != "" ]; do
+    case $1 in
+        -d | --debug )      LEVEL='debug'
+                            ;;
+        -i | --info )       LEVEL='info'
+                            ;;
+        -w | --warn )       LEVEL='warn'
+                            ;;
+        -e | --error )      LEVEL='error'
+                            ;;
+        -c | --config )     shift
+                            CONFIG_FILE=$1
+                            ;;
+        * )                 usage
+                            exit 1
+    esac
+    shift
+done
+
+start_serv ${LEVEL} ${CONFIG_FILE}

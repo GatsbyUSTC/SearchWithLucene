@@ -1,0 +1,63 @@
+{
+    "base": {
+        "local_name":       "portal",
+        "require_django":   true
+    }, "server": [
+        {
+            "package":  "connection",
+            "name":     "tcp",
+            "class":    "TCPServer"
+        },
+        {
+            "package":  "connection",
+            "name":     "xmpp",
+            "class":    "XmppConnection"
+        },
+        {
+            "package":  "dumb_http_server",
+            "name":     "web-server",
+            "class":    "DumbHttpServer"
+        }
+    ], "client": [
+        {
+            "package":  "connection",
+            "name":     "tcp-client",
+            "class":    "TCPClientMsgSession"
+        }
+    ], "message": [
+        "message.common"
+    ], "endpoint": [
+        {
+            "type":     "xmpp",
+            "kwargs": {
+                "jid":          "service-portal@socialtv",
+                "password":     "111111",
+                "server_addr":  "155.69.146.100"
+            }
+        },
+        {
+            "type":     "web-server",
+            "kwargs": {
+                "listen_port":  7080
+            },
+            "delay_start":  true
+        }
+    ], "connections": [
+        {
+            "type":     "tcp-client",
+            "name":     "service1",
+            "kwargs":   {
+                "address":  "127.0.0.1",
+                "port":     7001
+            }
+        },
+        {
+            "type":     "tcp-client",
+            "name":     "service2",
+            "kwargs":   {
+                "address":  "127.0.0.1",
+                "port":     7002
+            }
+        }
+    ]
+}

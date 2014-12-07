@@ -94,7 +94,7 @@ public class _search extends HttpServlet {
 		} catch (JSONException e) {
 			try {
 				jsonObject.put("status", "fail");
-				jsonObject.put("info", "json_error");
+				jsonObject.put("info", "json_error in _search HttpServlet");
 			} catch (JSONException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();

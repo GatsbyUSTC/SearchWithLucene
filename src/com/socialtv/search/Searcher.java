@@ -155,6 +155,7 @@ public class Searcher {
 			JSONArray data = new JSONArray();
 			for (int i = startIndex; i < responseCount + startIndex; i++) {
 				Document doc = searcher.doc(hits[i].doc);
+				System.out.print(doc);
 				JSONObject json = new JSONObject();
 				json.put("id", doc.get("id"));
 				data.put(json);

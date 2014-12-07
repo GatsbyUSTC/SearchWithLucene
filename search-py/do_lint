@@ -1,0 +1,8 @@
+#!/bin/bash
+pushd `dirname $0` > /dev/null
+SCRIPTPATH=`pwd`
+popd > /dev/null
+
+export PYTHONPATH="$SCRIPTPATH/libs"
+. "$SCRIPTPATH/../../python27/bin/activate"
+pylint -d C0326,C0111 $@

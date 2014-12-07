@@ -1,0 +1,18 @@
+#!/bin/sh
+PORT=7080
+if [ "$#" -gt 0 ]; then
+    PORT=$1
+fi
+send_request(){
+    echo ""
+    echo "sending request to http server on port ${PORT}"
+    echo "$1"
+    echo ""
+    echo "response"
+    curl http://localhost:${PORT}/service1/ -d "$1"
+    echo ""
+}
+send_request '{"type": "recent", "count": 3}'
+send_request '{"type": "error-type-demo", "count": 3}'
+send_request '{"type": "popular", "range": {"startIndex": 0, "maxCount": 5}}'
+send_request '{"type": "epg-channel-list"}'
