@@ -1,0 +1,11 @@
+__pycache__
+*.xml
+*.bak
+*.pyc
+*.pyo
+*.log
+*.swp
+*.swo
+*.swn
+.DS_Store
+*.py~

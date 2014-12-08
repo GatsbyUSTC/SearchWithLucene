@@ -1,0 +1,6 @@
+#!/bin/bash
+daemon -o search.log -D `pwd` --name=socialtv-search -r -- python              \
+    service_base.py --info --show-warnings --config-file config.json     \
+    --log-format "%(asctime)s %(module)s(%(lineno)d) %(levelname)s %(funcName)s %(threadName)s: %(message)s"
+
+

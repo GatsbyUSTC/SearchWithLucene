@@ -156,6 +156,7 @@ public class Searcher {
 			JSONArray data = new JSONArray();
 			for (int i = startIndex; i < responseCount + startIndex; i++) {
 				Document doc = searcher.doc(hits[i].doc);
+				System.out.print(doc);
 				JSONObject json = new JSONObject();
 				List<IndexableField> storedFields = doc.getFields();
 				for (int j = 0; j < storedFields.size(); j++) {

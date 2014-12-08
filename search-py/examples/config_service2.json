@@ -1,0 +1,36 @@
+{
+    "base": {
+        "local_name":       "service2",
+        "require_django":   true
+    }, "server": [
+        {
+            "package":  "connection",
+            "name":     "tcp",
+            "class":    "TCPServer"
+        },
+        {
+            "package":  "connection",
+            "name":     "xmpp",
+            "class":    "XmppConnection"
+        }
+    ], "message": [
+        "message.common",
+        "examples.messages"
+    ], "endpoint": [
+        {
+            "type":     "tcp",
+            "kwargs":   {
+                "local_addr":   "127.0.0.1",
+                "local_port":   7002
+            }
+        },
+        {
+            "type":     "xmpp",
+            "kwargs": {
+                "jid":          "service2@socialtv",
+                "password":     "111111",
+                "server_addr":  "155.69.146.100"
+            }
+        }
+    ]
+}

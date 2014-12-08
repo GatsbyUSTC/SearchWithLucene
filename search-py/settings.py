@@ -1,0 +1,1 @@
+from SocialTV.settings import *

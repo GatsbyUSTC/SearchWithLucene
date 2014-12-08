@@ -1,0 +1,4 @@
+#!/bin/sh
+python ./runtest.py -vp && python libs/gprof2dot.py -f pstats --show-samples profile.dat | dot -Tpdf -oout.pdf 2>/dev/null && open out.pdf
+sleep 1
+rm -f profile.dat out.pdf
