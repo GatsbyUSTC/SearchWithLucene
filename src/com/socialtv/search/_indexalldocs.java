@@ -82,6 +82,7 @@ public class _indexalldocs extends HttpServlet {
 				+ "/WEB-INF/index_files/spellCheckerIndex";
 		String spellCheckerDictPath = rootPath
 				+ "/WEB-INF/index_files/spellCheckerDic/4000-most-common-english-words-csv.csv";
+		String xmlPath = rootPath + "/WEB-INF/config/config.xml";
 
 		// Set response configuration
 		response.setContentType("application/json; charset=UTF-8");
@@ -104,7 +105,7 @@ public class _indexalldocs extends HttpServlet {
 
 		// Create a new thread to do the index process
 		IndexThread indexThread = new IndexThread(indexPath,
-				spellCheckerDictPath, spellCheckerIndexPath);
+				spellCheckerDictPath, spellCheckerIndexPath, xmlPath);
 		Thread thread = new Thread(indexThread);
 
 		// Return success

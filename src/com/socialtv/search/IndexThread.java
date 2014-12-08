@@ -9,18 +9,20 @@ public class IndexThread implements Runnable {
 	private String indexPath;
 	private String spellCheckerIndexPath;
 	private String spellCheckerDictPath;
+	private String xmlPath;
 
-	public IndexThread(String iP, String sCDP, String sCIP) {
+	public IndexThread(String iP, String sCDP, String sCIP, String xP) {
 		indexPath = iP;
 		spellCheckerIndexPath = sCIP;
 		spellCheckerDictPath = sCDP;
+		xmlPath = xP;
 	}
 
 	@Override
 	public void run() {
 		logger.info("index writing starts");
 		Indexer.indexAllDocs(indexPath, spellCheckerDictPath,
-				spellCheckerIndexPath);
+				spellCheckerIndexPath, xmlPath);
 		logger.info("index writing completes");
 	}
 

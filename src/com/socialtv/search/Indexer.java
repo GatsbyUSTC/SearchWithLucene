@@ -34,54 +34,32 @@ public class Indexer {
 	// Get the indexlog logger
 	private static final Logger logger = Logger.getLogger("indexlog");
 	// This is the java format url of the database
-	private static final String dburl = "jdbc:mysql://155.69.146.44:3306/socialtv";
+	private static String dburl;
 	// This is the username of the database
-	private static final String username = "socialtv";
+	private static String username;
 	// This is the password of the database
-	private static final String password = "SocialTV";
-
+	private static String password;
 	// This is the database query
-	private static final String dbquery = "SELECT content.id AS content_id, content.title AS content_title, "
-			+ "content.video_info AS content_video_info, content.description AS content_description, "
-			+ "content.update_time AS content_update_time, content.rating_total AS content_rating_total, "
-			+ "content.rating_count AS content_rating_count, content.watch_count AS content_watch_count, "
-			+ "category.id AS category_id, category.name AS category_name, "
-			+ "tag.id AS tag_id, tag.name AS tag_name, "
-			+ "auth_user.id AS auth_user_id, auth_user.username AS auth_user_username, "
-			+ "ott_content.original_link AS ott_content_original_link "
-			+ "FROM content LEFT JOIN category ON content.category_id = category.id "
-			+ "LEFT JOIN tag ON content.id = tag.content_id "
-			+ "LEFT JOIN auth_user ON content.owner_id = auth_user.id "
-			+ "LEFT JOIN ott_content ON content.id = ott_content.content_id ";
+	private static String dbquery;
 
 	public Indexer() {
 	}
 
-	public static ArrayList<String> getFields() {
-
-		ArrayList<String> fields = new ArrayList<String>();
-		try {
-			DriverManager.registerDriver(new Driver());
-			Connection con = DriverManager.getConnection(dburl, username,
-					password);
-			Statement stmt = con.createStatement();
-			ResultSet rs = stmt.executeQuery(dbquery);
-			ResultSetMetaData rsmt = rs.getMetaData();
-
-			for (int i = 1; i < rsmt.getColumnCount() + 1; i++) {
-				fields.add(rsmt.getColumnLabel(i));
-			}
-
-			rs.close();
-			stmt.close();
-		} catch (SQLException e) {
-			logger.severe(e.getLocalizedMessage());
+	public static void getConfig(String xmlpath) {
+		XMLReader reader = new XMLReader();
+		if(!reader.readXML(xmlpath)){
+			logger.severe("config.xml reading fault");
+			return ;
 		}
-		return fields;
+		dburl = reader.geturl();
+		username = reader.getusername();
+		password = reader.getpassword();
+		dbquery = reader.getqeury();
 	}
+	
+	public static boolean indexOneDoc(JSONObject json, String indexPath, String xmlpath) {
 
-	public static boolean indexOneDoc(JSONObject json, String indexPath) {
-
+		getConfig(xmlpath);
 		// Construct database query
 		String id = null;
 		try {
@@ -123,8 +101,9 @@ public class Indexer {
 	// This static method is called when user wants to reindex all videos'
 	// information.
 	public static void indexAllDocs(String indexPath,
-			String spellCheckerDictPath, String spellCheckerIndexPath) {
-
+			String spellCheckerDictPath, String spellCheckerIndexPath, String xmlpath) {
+		
+		getConfig(xmlpath);
 		try {
 			DriverManager.registerDriver(new Driver());
 			// Get the connection
@@ -132,6 +111,7 @@ public class Indexer {
 					password);
 			Statement stmt = con.createStatement();
 			ResultSet rs = stmt.executeQuery(dbquery);
+			
 			// We want to recreate an index, so the OpenMode should be CREATE.
 			addDocument(rs, OpenMode.CREATE, indexPath);
 
@@ -222,7 +202,6 @@ public class Indexer {
 			indexWriter.addDocument(doc);
 		}
 		indexWriter.close();
-
 	}
 
 }

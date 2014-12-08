@@ -2,10 +2,13 @@ package com.socialtv.search;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.IndexableField;
+import org.apache.lucene.index.IndexableFieldType;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queries.TermsFilter;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
@@ -24,6 +27,7 @@ import org.apache.lucene.store.FSDirectory;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.wltea.analyzer.lucene.IKAnalyzer;
+
 
 public class Searcher {
 
@@ -47,12 +51,12 @@ public class Searcher {
 	private void search() {
 
 		// The fields we want to search.
-		String[] fields = { "title", "description" };
+		String[] searchFields = { "title", "description" };
 		try {
 			// Get search keywords from request
 			String keywords = requestJson.getString("keywords");
 			// With MultiFieldQueryPaser, we specify fields and analyzer
-			MultiFieldQueryParser mfqp = new MultiFieldQueryParser(fields,
+			MultiFieldQueryParser mfqp = new MultiFieldQueryParser(searchFields,
 					new IKAnalyzer(true));
 			
 			// Get Query after parsing the keywords with the help of
@@ -148,14 +152,14 @@ public class Searcher {
 
 			responseJson.put("responseCount", responseCount);
 
-			ArrayList<String> fieldname = Indexer.getFields();
 			// Put all data into responseJson
 			JSONArray data = new JSONArray();
 			for (int i = startIndex; i < responseCount + startIndex; i++) {
 				Document doc = searcher.doc(hits[i].doc);
 				JSONObject json = new JSONObject();
-				for (int j = 0; j < fieldname.size(); j++) {
-					json.put(fieldname.get(j), doc.get(fieldname.get(j)));
+				List<IndexableField> storedFields = doc.getFields();
+				for (int j = 0; j < storedFields.size(); j++) {
+						json.put(storedFields.get(j).name(), storedFields.get(j).stringValue());					
 				}
 				if (!(doc.get("content_video_info").equals(""))) {
 					JSONObject tempJson = new JSONObject(doc.get("content_video_info"));
