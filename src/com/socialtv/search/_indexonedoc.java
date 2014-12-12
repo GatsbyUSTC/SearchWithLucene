@@ -77,9 +77,9 @@ public class _indexonedoc extends HttpServlet {
 			HttpServletResponse response) throws ServletException, IOException {
 
 		// Get index path and spell checker index path
-		String indexPath = rootPath + "/WEB-INF/index_files/index";
+		String indexPath = rootPath + "/WEB-INF/index";
 		String xmlPath = rootPath + "/WEB-INF/config/config.xml";
-		
+
 		// Set response configuration
 		response.setContentType("application/json; charset=UTF-8");
 		PrintWriter out = response.getWriter();

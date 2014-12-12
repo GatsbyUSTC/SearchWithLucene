@@ -5,9 +5,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -46,18 +44,19 @@ public class Indexer {
 	}
 
 	public static void getConfig(String xmlpath) {
-		XMLReader reader = new XMLReader();
-		if(!reader.readXML(xmlpath)){
+		ConfigReader reader = new ConfigReader();
+		if (!reader.readXML(xmlpath)) {
 			logger.severe("config.xml reading fault");
-			return ;
+			return;
 		}
 		dburl = reader.geturl();
 		username = reader.getusername();
 		password = reader.getpassword();
 		dbquery = reader.getqeury();
 	}
-	
-	public static boolean indexOneDoc(JSONObject json, String indexPath, String xmlpath) {
+
+	public static boolean indexOneDoc(JSONObject json, String indexPath,
+			String xmlpath) {
 
 		getConfig(xmlpath);
 		// Construct database query
@@ -101,8 +100,8 @@ public class Indexer {
 	// This static method is called when user wants to reindex all videos'
 	// information.
 	public static void indexAllDocs(String indexPath,
-			String spellCheckerDictPath, String spellCheckerIndexPath, String xmlpath) {
-		
+			String xmlpath) {
+
 		getConfig(xmlpath);
 		try {
 			DriverManager.registerDriver(new Driver());
@@ -111,15 +110,13 @@ public class Indexer {
 					password);
 			Statement stmt = con.createStatement();
 			ResultSet rs = stmt.executeQuery(dbquery);
-			
+
 			// We want to recreate an index, so the OpenMode should be CREATE.
 			addDocument(rs, OpenMode.CREATE, indexPath);
 
 			rs.close();
 			stmt.close();
 			con.close();
-			Suggester.indexSpellCheker(spellCheckerDictPath,
-					spellCheckerIndexPath);
 		} catch (Exception e) {
 			logger.severe(e.getLocalizedMessage());
 		}
@@ -202,6 +199,18 @@ public class Indexer {
 			indexWriter.addDocument(doc);
 		}
 		indexWriter.close();
+	}
+
+	// Test indexing all files
+	public static void main(String[] args) {
+		String indexPath = "WebContent/WEB-INF/index";
+		String xmlPath = "WebContent/WEB-INF/config/config.xml";
+		long startTime = System.currentTimeMillis();
+		System.out.println("index write starts");
+		Indexer.indexAllDocs(indexPath, xmlPath);
+		long endTime = System.currentTimeMillis();
+		System.out.println("index write finishes");
+		System.out.println("total time: " + (endTime - startTime) + " ms");
 	}
 
 }

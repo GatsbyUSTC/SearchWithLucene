@@ -43,7 +43,7 @@ public class _search extends HttpServlet {
 		// Get root path
 		rootPath = config.getServletContext().getRealPath("");
 		String logPath = rootPath + "/WEB-INF/log/search.log";
-		
+
 		// Redirect logger to a file handler
 		Handler fh = null;
 		try {
@@ -73,9 +73,7 @@ public class _search extends HttpServlet {
 			HttpServletResponse response) throws ServletException, IOException {
 
 		// Get index path and spell checker index path
-		String indexPath = rootPath + "/WEB-INF/index_files/index";
-		String spellCheckerIndexPath = rootPath
-				+ "/WEB-INF/index_files/spellCheckerIndex";
+		String indexPath = rootPath + "/WEB-INF/index";
 
 		// Set response configuration
 		response.setContentType("application/json; charset=UTF-8");
@@ -94,7 +92,7 @@ public class _search extends HttpServlet {
 		} catch (JSONException e) {
 			try {
 				jsonObject.put("status", "fail");
-				jsonObject.put("info", "json_error in _search HttpServlet");
+				jsonObject.put("info", "json_error");
 			} catch (JSONException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -103,9 +101,8 @@ public class _search extends HttpServlet {
 			return;
 		}
 		// construct Searcher
-		Searcher indexSearcher = new Searcher(requestJson, indexPath,
-				spellCheckerIndexPath);
-		// Get response 
+		Searcher indexSearcher = new Searcher(requestJson, indexPath);
+		// Get response
 		out.print(indexSearcher.getResponse());
 	}
 }
