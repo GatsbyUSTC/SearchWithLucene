@@ -77,11 +77,8 @@ public class _indexalldocs extends HttpServlet {
 			HttpServletResponse response) throws ServletException, IOException {
 
 		// Get index path and spell checker index path
-		String indexPath = rootPath + "/WEB-INF/index_files/index";
-		String spellCheckerIndexPath = rootPath
-				+ "/WEB-INF/index_files/spellCheckerIndex";
-		String spellCheckerDictPath = rootPath
-				+ "/WEB-INF/index_files/spellCheckerDic/4000-most-common-english-words-csv.csv";
+		String indexPath = rootPath + "/WEB-INF/index";
+		String xmlPath = rootPath + "/WEB-INF/config/config.xml";
 
 		// Set response configuration
 		response.setContentType("application/json; charset=UTF-8");
@@ -103,8 +100,7 @@ public class _indexalldocs extends HttpServlet {
 		}
 
 		// Create a new thread to do the index process
-		IndexThread indexThread = new IndexThread(indexPath,
-				spellCheckerDictPath, spellCheckerIndexPath);
+		IndexThread indexThread = new IndexThread(indexPath, xmlPath);
 		Thread thread = new Thread(indexThread);
 
 		// Return success

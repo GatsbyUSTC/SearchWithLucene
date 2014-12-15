@@ -1,11 +1,12 @@
 package com.socialtv.search;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queries.TermsFilter;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
@@ -33,13 +34,11 @@ public class Searcher {
 	private static final int DEFAULTRESPONSECOUNT = 500;
 
 	private String indexPath;
-	private String spellCheckerIndexPath;
 	private JSONObject requestJson;
 	private JSONObject responseJson;
 
-	public Searcher(JSONObject json, String iP, String sCIP) {
+	public Searcher(JSONObject json, String iP) {
 		indexPath = iP;
-		spellCheckerIndexPath = sCIP;
 		requestJson = json;
 		responseJson = new JSONObject();
 	}
@@ -47,14 +46,14 @@ public class Searcher {
 	private void search() {
 
 		// The fields we want to search.
-		String[] fields = { "title", "description" };
+		String[] searchFields = { "title", "description" };
 		try {
 			// Get search keywords from request
 			String keywords = requestJson.getString("keywords");
 			// With MultiFieldQueryPaser, we specify fields and analyzer
-			MultiFieldQueryParser mfqp = new MultiFieldQueryParser(fields,
-					new IKAnalyzer(true));
-			
+			MultiFieldQueryParser mfqp = new MultiFieldQueryParser(
+					searchFields, new IKAnalyzer(true));
+
 			// Get Query after parsing the keywords with the help of
 			// MultiFieldQueryParser.
 			Query query = mfqp.parse(keywords);
@@ -81,9 +80,9 @@ public class Searcher {
 			Filter inDaysFilter = null;
 			if (requestJson.has("inDays")) {
 				inDays = requestJson.getInt("inDays");
-				long startTime = System.currentTimeMillis()
-						- (long) inDays * 24l * 3600l * 1000l;
-		
+				long startTime = System.currentTimeMillis() - (long) inDays
+						* 24l * 3600l * 1000l;
+
 				long endTime = System.currentTimeMillis();
 
 				// Create a NumericRangeFilter when user specify the creation
@@ -100,10 +99,9 @@ public class Searcher {
 					sort = new Sort(new SortField("watch_count", Type.LONG,
 							true));
 				// Create a Sort when user specify a sort way.
-				else if (sortWay.equals("t"))
-					{
+				else if (sortWay.equals("t")) {
 					sort = new Sort(new SortField("tempTime", Type.LONG, true));
-					}
+				}
 			}
 
 			int startIndex = 0, requestCount = DEFAULTRESPONSECOUNT;
@@ -135,32 +133,25 @@ public class Searcher {
 			// Get hit documents
 			ScoreDoc[] hits = topDocs.scoreDocs;
 			// Get hit document number
-			int responseCount = Math.min(topDocs.totalHits - startIndex,
-					requestCount);
-			responseCount = responseCount < 0 ? 0 : responseCount;
-
-			// When there is few hits, we generate some suggest words
-			if (responseCount < 3) {
-				String[] sugWrods = Suggester.suggestSpellChecker(keywords,
-						spellCheckerIndexPath);
-				responseJson.put("suggestWords", sugWrods);
-			}
+			int responseCount = topDocs.totalHits;
 
 			responseJson.put("responseCount", responseCount);
 
-			ArrayList<String> fieldname = Indexer.getFields();
 			// Put all data into responseJson
 			JSONArray data = new JSONArray();
 			for (int i = startIndex; i < responseCount + startIndex; i++) {
 				Document doc = searcher.doc(hits[i].doc);
-				System.out.print(doc);
 				JSONObject json = new JSONObject();
-				for (int j = 0; j < fieldname.size(); j++) {
-					json.put(fieldname.get(j), doc.get(fieldname.get(j)));
+				List<IndexableField> storedFields = doc.getFields();
+				for (int j = 0; j < storedFields.size(); j++) {
+					json.put(storedFields.get(j).name(), storedFields.get(j)
+							.stringValue());
 				}
 				if (!(doc.get("content_video_info").equals(""))) {
-					JSONObject tempJson = new JSONObject(doc.get("content_video_info"));
-					json.put("length", tempJson.getJSONObject("format").getString("duration"));
+					JSONObject tempJson = new JSONObject(
+							doc.get("content_video_info"));
+					json.put("length", tempJson.getJSONObject("format")
+							.getString("duration"));
 				} else {
 					json.put("length", "0");
 				}

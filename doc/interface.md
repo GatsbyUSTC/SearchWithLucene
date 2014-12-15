@@ -85,7 +85,6 @@ The third interface is used to search.
     data: [{
             id: "sfada"
         }, ...] //json array
-    suggestWords: [“a”, ”b”, ”c”, ”d”] //json array,optioanl,only shows when responseCount < 3
 }
 ```
 * **Note**
