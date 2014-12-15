@@ -85,7 +85,7 @@ public class ConfigReader {
 
 	// for testing
 	public void saveToXML(String xml) {
-		String dburl = "jdbc:mysql://155.69.146.44:3306/socialtv";
+		String dburl = "jdbc:mysql://155.69.146.82:3306/socialtv";
 		String username = "socialtv";
 		String password = "SocialTV";
 		String dbquery = "SELECT content.id AS content_id, content.title AS content_title, "

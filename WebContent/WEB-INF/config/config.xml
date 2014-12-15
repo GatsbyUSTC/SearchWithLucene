@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <database>
-<url>jdbc:mysql://155.69.146.44:3306/socialtv</url>
+<url>jdbc:mysql://155.69.146.82:3306/socialtv</url>
 <username>socialtv</username>
 <password>SocialTV</password>
 <query>SELECT content.id AS content_id, content.title AS content_title, content.video_info AS content_video_info, content.description AS content_description, content.update_time AS content_update_time, content.rating_total AS content_rating_total, content.rating_count AS content_rating_count, content.watch_count AS content_watch_count, category.id AS category_id, category.name AS category_name, tag.id AS tag_id, tag.name AS tag_name, auth_user.id AS auth_user_id, auth_user.username AS auth_user_username, ott_content.original_link AS ott_content_original_link FROM content LEFT JOIN category ON content.category_id = category.id LEFT JOIN tag ON content.id = tag.content_id LEFT JOIN auth_user ON content.owner_id = auth_user.id LEFT JOIN ott_content ON content.id = ott_content.content_id</query>
