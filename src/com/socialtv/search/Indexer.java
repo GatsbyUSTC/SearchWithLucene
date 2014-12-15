@@ -32,6 +32,7 @@ public class Indexer {
 	// Get the indexlog logger
 	private static final Logger logger = Logger.getLogger("indexlog");
 	// This is the java format url of the database
+	//private static final String dburl = "jdbc:mysql://155.69.146.82:3306/socialtv";
 	private static String dburl;
 	// This is the username of the database
 	private static String username;
