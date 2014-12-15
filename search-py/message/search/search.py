@@ -33,9 +33,14 @@ class SearchRecv(MessageRecv):
 
     def handle_impl(self):
         req = requests.post(settings.SEARCH_URL+"/stvsearch/_search", data=json.dumps(self.data))
-        logging.info(json.dumps(self.data))
-        logging.info(req.text)
-        return self.reply_result(result = req.json())
+        #logging.info(json.dumps(self.data))
+        resp_json = req.json()
+        logging.info(resp_json)
+        for item in resp_json['data']:
+            item.pop('content_video_info', None)
+            item['video_url'] = settings.HDFS_VIDEO_PATH + item['content_id'] + "." + 'mp4'
+            item['thumb_url'] = settings.HDFS_IMG_PATH + item['content_id'] + "-thumb." + 'jpg'
+        return self.reply_result(result = resp_json)
 
 class LoadExternalRecv(MessageRecv):
     @classmethod
