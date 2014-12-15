@@ -30,7 +30,7 @@ public class _indexalldocs extends HttpServlet {
 
 	// Create indexlog logger
 	private static final Logger logger = Logger.getLogger("indexlog");
-	private String rootPath;
+	private static String rootPath;
 
 	/**
 	 * @see HttpServlet#HttpServlet()

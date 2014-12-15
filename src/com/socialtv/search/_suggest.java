@@ -19,25 +19,23 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * Servlet implementation class _search This Servlet is called when searching.
+ * Servlet implementation class _suggest
  */
-@WebServlet("/_search")
-public class _search extends HttpServlet {
+@WebServlet("/_suggest")
+public class _suggest extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+    private static final Logger logger = Logger.getLogger("searchlog");
+    private static String rootPath;
+    
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public _suggest() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
 
-	// Create searchlog logger
-	private static final Logger logger = Logger.getLogger("searchlog");
-	private static String rootPath;
-
-	/**
-	 * @see HttpServlet#HttpServlet()
-	 */
-	public _search() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
-
-	public void init(ServletConfig config) throws ServletException {
+    public void init(ServletConfig config) throws ServletException {
 		super.init(config);
 
 		// Get root path
@@ -54,23 +52,19 @@ public class _search extends HttpServlet {
 		LogManager.getLogManager().reset();
 		logger.addHandler(fh);
 	}
-
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
-	 *      response)
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
-	protected void doGet(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		doPost(request, response);
+		doGet(request, response);
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
-	protected void doPost(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
 
 		// Get index path and spell checker index path
 		String indexPath = rootPath + "/WEB-INF/index";
@@ -100,9 +94,8 @@ public class _search extends HttpServlet {
 			out.print(jsonObject.toString());
 			return;
 		}
-		// construct Searcher
-		Searcher indexSearcher = new Searcher(requestJson, indexPath);
-		// Get response
-		out.print(indexSearcher.getResponse());
+		AutoSuggester suggester = new AutoSuggester(requestJson, indexPath);
+		out.print(suggester.suggest());
 	}
+
 }

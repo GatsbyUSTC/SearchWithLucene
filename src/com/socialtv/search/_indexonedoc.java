@@ -31,7 +31,7 @@ public class _indexonedoc extends HttpServlet {
 
 	// Create the indexlog logger
 	private static final Logger logger = Logger.getLogger("indexlog");
-	private String rootPath;
+	private static String rootPath;
 
 	/**
 	 * @see HttpServlet#HttpServlet()

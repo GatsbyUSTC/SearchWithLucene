@@ -180,6 +180,7 @@ public class Indexer {
 			doc.add(new StringField("id", id, Store.NO));
 			doc.add(new StringField("owner_id", owner_id, Store.NO));
 			doc.add(new StringField("category_id", category_id, Store.NO));
+			doc.add(new StringField("whole_title", title, Store.NO));
 
 			// long field is used to filter and sort
 			doc.add(new LongField("watch_count", watch_count, Store.NO));
