@@ -8,7 +8,6 @@ import java.sql.ResultSetMetaData;
 import java.sql.Statement;
 import java.util.logging.Logger;
 
-import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.LongField;
@@ -32,7 +31,8 @@ public class Indexer {
 	// Get the indexlog logger
 	private static final Logger logger = Logger.getLogger("indexlog");
 	// This is the java format url of the database
-	//private static final String dburl = "jdbc:mysql://155.69.146.82:3306/socialtv";
+	// private static final String dburl =
+	// "jdbc:mysql://155.69.146.82:3306/socialtv";
 	private static String dburl;
 	// This is the username of the database
 	private static String username;
@@ -100,8 +100,7 @@ public class Indexer {
 
 	// This static method is called when user wants to reindex all videos'
 	// information.
-	public static void indexAllDocs(String indexPath,
-			String xmlpath) {
+	public static void indexAllDocs(String indexPath, String xmlpath) {
 
 		getConfig(xmlpath);
 		try {
@@ -126,10 +125,9 @@ public class Indexer {
 	private static void addDocument(ResultSet rs, OpenMode om, String indexPath)
 			throws Exception {
 
-		// IKanalyzer is a good analyzer for both Chinese and English.
-		Analyzer analyzer = new IKAnalyzer(true);
 		// This IndexWriterConfig is used to specify the version and analyzer.
-		IndexWriterConfig iwc = new IndexWriterConfig(Version.LATEST, analyzer);
+		IndexWriterConfig iwc = new IndexWriterConfig(Version.LATEST,
+				new IKAnalyzer(true));
 		// OpenMode refers to the open mode of index: CREATE or APPEND can be
 		// chosen.
 		iwc.setOpenMode(om);
@@ -150,6 +148,7 @@ public class Indexer {
 
 			title = rs.getString("content_title");
 			title = title != null ? title : "null";
+			System.out.println(title);
 
 			description = rs.getString("content_description");
 			description = description != null ? description : "null";
@@ -201,6 +200,7 @@ public class Indexer {
 			indexWriter.addDocument(doc);
 		}
 		indexWriter.close();
+		indexDir.close();
 	}
 
 	// Test indexing all files

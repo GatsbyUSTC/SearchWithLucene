@@ -158,8 +158,9 @@ public class Searcher {
 				data.put(json);
 			}
 			responseJson.put("data", data);
+
+			directory.close();
 		} catch (Exception e) { /* report an error */
-			e.printStackTrace();
 			logger.severe(e.getLocalizedMessage());
 		}
 	}

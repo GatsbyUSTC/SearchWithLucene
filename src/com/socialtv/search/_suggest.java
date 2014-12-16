@@ -24,18 +24,18 @@ import org.json.JSONObject;
 @WebServlet("/_suggest")
 public class _suggest extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-    private static final Logger logger = Logger.getLogger("searchlog");
-    private static String rootPath;
-    
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public _suggest() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
+	private static final Logger logger = Logger.getLogger("searchlog");
+	private static String rootPath;
 
-    public void init(ServletConfig config) throws ServletException {
+	/**
+	 * @see HttpServlet#HttpServlet()
+	 */
+	public _suggest() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	public void init(ServletConfig config) throws ServletException {
 		super.init(config);
 
 		// Get root path
@@ -52,18 +52,23 @@ public class _suggest extends HttpServlet {
 		LogManager.getLogManager().reset();
 		logger.addHandler(fh);
 	}
+
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doGet(HttpServletRequest request,
+			HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request,
+			HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 
 		// Get index path and spell checker index path
@@ -88,13 +93,12 @@ public class _suggest extends HttpServlet {
 				jsonObject.put("status", "fail");
 				jsonObject.put("info", "json_error");
 			} catch (JSONException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				logger.severe(e1.getLocalizedMessage());
 			}
 			out.print(jsonObject.toString());
 			return;
 		}
-		AutoSuggester suggester = new AutoSuggester(requestJson, indexPath);
+		Suggester suggester = new Suggester(requestJson, indexPath);
 		out.print(suggester.suggest());
 	}
 
