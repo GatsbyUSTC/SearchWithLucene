@@ -65,7 +65,7 @@ public class Indexer {
 		try {
 			id = json.getString("id");
 		} catch (JSONException e1) {
-			e1.printStackTrace();
+			logger.severe(e1.getLocalizedMessage());
 		}
 
 		String onesdbquery = dbquery + " WHERE content.id = '" + id + "'";
@@ -148,7 +148,6 @@ public class Indexer {
 
 			title = rs.getString("content_title");
 			title = title != null ? title : "null";
-			System.out.println(title);
 
 			description = rs.getString("content_description");
 			description = description != null ? description : "null";

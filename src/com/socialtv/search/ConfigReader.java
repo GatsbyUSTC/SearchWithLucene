@@ -59,7 +59,6 @@ public class ConfigReader {
 		} catch (IOException ioe) {
 			System.err.println(ioe.getMessage());
 		}
-
 		return false;
 	}
 
