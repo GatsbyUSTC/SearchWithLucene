@@ -20,7 +20,6 @@ import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.wltea.analyzer.lucene.IKAnalyzer;
 
@@ -31,8 +30,6 @@ public class Indexer {
 	// Get the indexlog logger
 	private static final Logger logger = Logger.getLogger("indexlog");
 	// This is the java format url of the database
-	// private static final String dburl =
-	// "jdbc:mysql://155.69.146.82:3306/socialtv";
 	private static String dburl;
 	// This is the username of the database
 	private static String username;
@@ -64,10 +61,10 @@ public class Indexer {
 		String id = null;
 		try {
 			id = json.getString("id");
-		} catch (JSONException e1) {
+		} catch (Exception e1) {
 			logger.severe(e1.getLocalizedMessage());
 		}
-
+		
 		String onesdbquery = dbquery + " WHERE content.id = '" + id + "'";
 
 		try {
@@ -77,7 +74,7 @@ public class Indexer {
 					password);
 			Statement stmt = con.createStatement();
 			ResultSet rs = stmt.executeQuery(onesdbquery);
-
+			
 			// We want to add the information of the video to the index, so the
 			// OpenMoode should be APPEND.
 			if (rs.first()) {
@@ -135,7 +132,6 @@ public class Indexer {
 		Directory indexDir = FSDirectory.open(new File(indexPath));
 		// After several configurations, we can create a IndexWriter now.
 		IndexWriter indexWriter = new IndexWriter(indexDir, iwc);
-
 		String id = null, title = null, owner_id = null, category_id = null, description = null;
 		long watch_count = 0, tempTime = 0;
 
