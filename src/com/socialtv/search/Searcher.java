@@ -126,15 +126,15 @@ public class Searcher {
 			TopDocs topDocs = null;
 			// Start to search
 			if (sort == null)
-				topDocs = searcher.search(query, startIndex + requestCount * 2);
+				topDocs = searcher.search(query, startIndex + requestCount );
 			else
-				topDocs = searcher.search(query, startIndex + requestCount * 2, sort);
+				topDocs = searcher.search(query, startIndex + requestCount , sort);
 			// Get hit documents
 			ScoreDoc[] hits = topDocs.scoreDocs;
 			// Get hit document number
 			int responseCount = topDocs.totalHits;
 
-			System.out.println("requestCount:"+requestCount+" "+responseCount+" "+(hits.length));
+
 			
 			responseJson.put("responseCount", responseCount);
 
