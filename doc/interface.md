@@ -68,13 +68,13 @@ The third interface is used to search.
 {
     keywords: "good",
     filter: {
-        owner_id: "3", //string, opt
-        category_id: "3" //string, opt
+        owner_id: "3", //string, opt , no default value(all owner_id will be returned)
+        category_id: "3" //string, opt, no default value(all category_id will be returned)
     },
-    startIndex: 1, //int, opt, no less than zero
-    requestCount: 20, //int, opt
-    inDays: 300, //int, opt, days after update
-    sortWay: "s", //string, opt, s:relevant sort; t:update_time sort; v:watch_count sort;
+    startIndex: 1, //int, opt, no less than zero, default value 0
+    requestCount: 20, //int, opt, default value 500
+    inDays: 300, //int, opt, days after update, no default value(all time's video will be returned)
+    sortWay: "s", //string, opt, default value "s", s:relevant sort; t:update_time sort; v:watch_count sort; 
 }
 ```
 
