@@ -128,18 +128,19 @@ public class Searcher {
 			if (sort == null)
 				topDocs = searcher.search(query, startIndex + requestCount * 2);
 			else
-				topDocs = searcher.search(query, startIndex + requestCount * 2,
-						sort);
+				topDocs = searcher.search(query, startIndex + requestCount * 2, sort);
 			// Get hit documents
 			ScoreDoc[] hits = topDocs.scoreDocs;
 			// Get hit document number
 			int responseCount = topDocs.totalHits;
 
+			System.out.println("requestCount:"+requestCount+" "+responseCount+" "+(hits.length));
+			
 			responseJson.put("responseCount", responseCount);
 
 			// Put all data into responseJson
 			JSONArray data = new JSONArray();
-			for (int i = startIndex; i < responseCount + startIndex; i++) {
+			for (int i = startIndex; i < requestCount + startIndex && i< hits.length; i++) {
 				Document doc = searcher.doc(hits[i].doc);
 				JSONObject json = new JSONObject();
 				List<IndexableField> storedFields = doc.getFields();

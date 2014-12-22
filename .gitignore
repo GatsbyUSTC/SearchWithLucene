@@ -6,8 +6,7 @@ build/
 *.swn
 index/*
 .classpath
-WebContent/WEB-INF/index_files/index/*
-
+WebContent/WEB-INF/index/*
 
 *.pydevproject
 .metadata
